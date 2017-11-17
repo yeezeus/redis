@@ -1,23 +1,22 @@
-**This is meant to be a skeleton repo for adding support for additional databases**
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/k8sdb/redis)](https://goreportcard.com/report/github.com/k8sdb/redis)
 
-[Website](https://appscode.com) • [Slack](https://slack.appscode.com) • [Twitter](https://twitter.com/AppsCodeHQ)
+[Website](https://kubedb.com) • [Slack](http://slack.kubernetes.io) • [Twitter](https://twitter.com/AppsCodeHQ)
 
-## How to use
-* Change all `redis` in a string to your database type
-* Rename methods if necessary
-* Change all `const` to use your database resource
-    * tapi.ResourceKindXdb
-    * tapi.ResourceTypeXdb
-    * tapi.ResourceNameXdb
-    * tapi.ResourceCodeXdb
-* Fix all `@TODO` to support your resource
-* Change variable name, if necessary
+# redis
+Run Redis in Kubernetes
 
+## Installation
+To install KubeDB, please follow the guide [here](https://github.com/k8sdb/cli/blob/master/docs/install.md).
+
+## Using KubeDB
+Want to learn how to use KubeDB? Please start [here](https://github.com/k8sdb/cli/blob/master/docs/tutorials/README.md).
+
+## Contribution guidelines
+Want to help improve KubeDB? Please start [here](https://github.com/k8sdb/cli/blob/master/CONTRIBUTING.md).
 
 ## Support
-If you have any questions, you can reach out to us.
-* [Slack](https://slack.appscode.com)
-* [Twitter](https://twitter.com/AppsCodeHQ)
-* [Website](https://appscode.com)
+If you have any questions, talk to us on the [Kubernetes Slack team](http://slack.kubernetes.io/) channel `#kubedb`.
+
+If you have found a bug with KubeDB or want to request for new features, please file issues on Github.
+ - For CLI issues, file a bug under [k8sdb/cli](https://github.com/k8sdb/cli) repository.
+ - For Backend operator issues, file a bug under [k8sdb/operator](https://github.com/k8sdb/operator) repository.
