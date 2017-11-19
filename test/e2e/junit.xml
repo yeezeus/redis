@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <testsuite tests="6" failures="0" time="681.917135645">
+      <testcase name="Redis Test General - should run successfully" classname="e2e Suite" time="75.0834444"></testcase>
+      <testcase name="Redis Test General With PVC should run successfully" classname="e2e Suite" time="55.062557075"></testcase>
+      <testcase name="Redis Test DoNotPause should work successfully" classname="e2e Suite" time="70.078651434"></testcase>
+      <testcase name="Redis Test Resume - should resume DormantDatabase successfully" classname="e2e Suite" time="125.147166177"></testcase>
+      <testcase name="Redis Test Resume With original Redis should resume DormantDatabase successfully" classname="e2e Suite" time="120.135422991"></testcase>
+      <testcase name="Redis Test Resume With original Redis Multiple times with PVC should resume DormantDatabase successfully" classname="e2e Suite" time="235.340309458"></testcase>
+  </testsuite>

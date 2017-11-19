@@ -3,11 +3,12 @@ package controller
 import (
 	"fmt"
 
-	tapi "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	"github.com/k8sdb/apimachinery/pkg/monitor"
+	"github.com/appscode/kutil/tools/monitoring/agents"
+	mona "github.com/appscode/kutil/tools/monitoring/api"
+	api "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
 )
 
-func (c *Controller) newMonitorController(redis *tapi.Xdb) (monitor.Monitor, error) {
+func (c *Controller) newMonitorController(redis *api.Redis) (mona.Agent, error) {
 	monitorSpec := redis.Spec.Monitor
 
 	if monitorSpec == nil {
@@ -15,38 +16,38 @@ func (c *Controller) newMonitorController(redis *tapi.Xdb) (monitor.Monitor, err
 	}
 
 	if monitorSpec.Prometheus != nil {
-		return monitor.NewPrometheusController(c.Client, c.ApiExtKubeClient, c.promClient, c.opt.OperatorNamespace), nil
+		return agents.New(monitorSpec.Agent, c.Client, c.ApiExtKubeClient, c.promClient), nil
 	}
 
-	return nil, fmt.Errorf("Monitoring controller not found for %v", monitorSpec)
+	return nil, fmt.Errorf("monitoring controller not found for %v", monitorSpec)
 }
 
-func (c *Controller) addMonitor(redis *tapi.Xdb) error {
-	ctrl, err := c.newMonitorController(redis)
+func (c *Controller) addMonitor(redis *api.Redis) error {
+	agent, err := c.newMonitorController(redis)
 	if err != nil {
 		return err
 	}
-	return ctrl.AddMonitor(redis.ObjectMeta, redis.Spec.Monitor)
+	return agent.Add(redis.StatsAccessor(), redis.Spec.Monitor)
 }
 
-func (c *Controller) deleteMonitor(redis *tapi.Xdb) error {
-	ctrl, err := c.newMonitorController(redis)
+func (c *Controller) deleteMonitor(redis *api.Redis) error {
+	agent, err := c.newMonitorController(redis)
 	if err != nil {
 		return err
 	}
-	return ctrl.DeleteMonitor(redis.ObjectMeta, redis.Spec.Monitor)
+	return agent.Delete(redis.StatsAccessor(), redis.Spec.Monitor)
 }
 
-func (c *Controller) updateMonitor(oldXdb, updatedXdb *tapi.Xdb) error {
+func (c *Controller) updateMonitor(oldRedis, updatedRedis *api.Redis) error {
 	var err error
-	var ctrl monitor.Monitor
-	if updatedXdb.Spec.Monitor == nil {
-		ctrl, err = c.newMonitorController(oldXdb)
+	var agent mona.Agent
+	if updatedRedis.Spec.Monitor == nil {
+		agent, err = c.newMonitorController(oldRedis)
 	} else {
-		ctrl, err = c.newMonitorController(updatedXdb)
+		agent, err = c.newMonitorController(updatedRedis)
 	}
 	if err != nil {
 		return err
 	}
-	return ctrl.UpdateMonitor(updatedXdb.ObjectMeta, oldXdb.Spec.Monitor, updatedXdb.Spec.Monitor)
+	return agent.Update(updatedRedis.StatsAccessor(), oldRedis.Spec.Monitor, updatedRedis.Spec.Monitor)
 }

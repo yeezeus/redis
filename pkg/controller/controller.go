@@ -7,9 +7,9 @@ import (
 	"github.com/appscode/go/hold"
 	"github.com/appscode/go/log"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	tapi "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	tcs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
-	kutildb "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1/util"
+	api "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
+	cs "github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1"
+	"github.com/k8sdb/apimachinery/client/typed/kubedb/v1alpha1/util"
 	amc "github.com/k8sdb/apimachinery/pkg/controller"
 	"github.com/k8sdb/apimachinery/pkg/eventer"
 	core "k8s.io/api/core/v1"
@@ -55,13 +55,12 @@ type Controller struct {
 	syncPeriod time.Duration
 }
 
-var _ amc.Snapshotter = &Controller{}
 var _ amc.Deleter = &Controller{}
 
 func New(
 	client kubernetes.Interface,
 	apiExtKubeClient apiextensionsclient.ApiextensionsV1beta1Interface,
-	extClient tcs.KubedbV1alpha1Interface,
+	extClient cs.KubedbV1alpha1Interface,
 	promClient pcm.MonitoringV1Interface,
 	cronController amc.CronControllerInterface,
 	opt Options,
@@ -75,7 +74,7 @@ func New(
 		promClient:       promClient,
 		cronController:   cronController,
 		// TODO
-		recorder:   eventer.NewEventRecorder(client, "Xdb operator"),
+		recorder:   eventer.NewEventRecorder(client, "Redis operator"),
 		opt:        opt,
 		syncPeriod: time.Minute * 2,
 	}
@@ -86,19 +85,10 @@ func (c *Controller) Run() {
 	// Ensure TPR
 	c.ensureCustomResourceDefinition()
 
-	// Start Cron
-	c.cronController.StartCron()
-	// Stop Cron
-	defer c.cronController.StopCron()
-
 	// Watch x  TPR objects
-	go c.watchXdb()
-	// Watch DatabaseSnapshot with labelSelector only for Xdb
-	go c.watchDatabaseSnapshot()
-	// Watch DeletedDatabase with labelSelector only for Xdb
+	go c.watchRedis()
+	// Watch DeletedDatabase with labelSelector only for Redis
 	go c.watchDeletedDatabase()
-	// hold
-	hold.Hold()
 }
 
 // Blocks caller. Intended to be called as a Go routine.
@@ -111,24 +101,24 @@ func (c *Controller) RunAndHold() {
 	hold.Hold()
 }
 
-func (c *Controller) watchXdb() {
+func (c *Controller) watchRedis() {
 	lw := &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.ExtClient.Xdbs(metav1.NamespaceAll).List(metav1.ListOptions{})
+			return c.ExtClient.Redises(metav1.NamespaceAll).List(metav1.ListOptions{})
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.ExtClient.Xdbs(metav1.NamespaceAll).Watch(metav1.ListOptions{})
+			return c.ExtClient.Redises(metav1.NamespaceAll).Watch(metav1.ListOptions{})
 		},
 	}
 
 	_, cacheController := cache.NewInformer(
 		lw,
-		&tapi.Xdb{},
+		&api.Redis{},
 		c.syncPeriod,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				redis := obj.(*tapi.Xdb)
-				kutildb.AssignTypeKind(redis)
+				redis := obj.(*api.Redis)
+				util.AssignTypeKind(redis)
 				if redis.Status.CreationTime == nil {
 					if err := c.create(redis); err != nil {
 						log.Errorln(err)
@@ -137,23 +127,23 @@ func (c *Controller) watchXdb() {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				redis := obj.(*tapi.Xdb)
-				kutildb.AssignTypeKind(redis)
+				redis := obj.(*api.Redis)
+				util.AssignTypeKind(redis)
 				if err := c.pause(redis); err != nil {
 					log.Errorln(err)
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
-				oldObj, ok := old.(*tapi.Xdb)
+				oldObj, ok := old.(*api.Redis)
 				if !ok {
 					return
 				}
-				newObj, ok := new.(*tapi.Xdb)
+				newObj, ok := new.(*api.Redis)
 				if !ok {
 					return
 				}
-				kutildb.AssignTypeKind(oldObj)
-				kutildb.AssignTypeKind(newObj)
+				util.AssignTypeKind(oldObj)
+				util.AssignTypeKind(newObj)
 				if !reflect.DeepEqual(oldObj.Spec, newObj.Spec) {
 					if err := c.update(oldObj, newObj); err != nil {
 						log.Errorln(err)
@@ -165,34 +155,9 @@ func (c *Controller) watchXdb() {
 	cacheController.Run(wait.NeverStop)
 }
 
-func (c *Controller) watchDatabaseSnapshot() {
-	labelMap := map[string]string{
-		// TODO: Use appropriate ResourceKind.
-		tapi.LabelDatabaseKind: tapi.ResourceKindXdb,
-	}
-	// Watch with label selector
-	lw := &cache.ListWatch{
-		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return c.ExtClient.Snapshots(metav1.NamespaceAll).List(
-				metav1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(labelMap).String(),
-				})
-		},
-		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-			return c.ExtClient.Snapshots(metav1.NamespaceAll).Watch(
-				metav1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(labelMap).String(),
-				})
-		},
-	}
-
-	amc.NewSnapshotController(c.Client, c.ApiExtKubeClient, c.ExtClient, c, lw, c.syncPeriod).Run()
-}
-
 func (c *Controller) watchDeletedDatabase() {
 	labelMap := map[string]string{
-		// TODO: Use appropriate ResourceKind.
-		tapi.LabelDatabaseKind: tapi.ResourceKindXdb,
+		api.LabelDatabaseKind: api.ResourceKindRedis,
 	}
 	// Watch with label selector
 	lw := &cache.ListWatch{
@@ -216,8 +181,7 @@ func (c *Controller) watchDeletedDatabase() {
 func (c *Controller) ensureCustomResourceDefinition() {
 	log.Infoln("Ensuring CustomResourceDefinition...")
 
-	// TODO: Use appropriate ResourceType.
-	resourceName := tapi.ResourceTypeXdb + "." + tapi.SchemeGroupVersion.Group
+	resourceName := api.ResourceTypeRedis + "." + api.SchemeGroupVersion.Group
 	if _, err := c.ApiExtKubeClient.CustomResourceDefinitions().Get(resourceName, metav1.GetOptions{}); err != nil {
 		if !kerr.IsNotFound(err) {
 			log.Fatalln(err)
@@ -234,14 +198,13 @@ func (c *Controller) ensureCustomResourceDefinition() {
 			},
 		},
 		Spec: extensionsobj.CustomResourceDefinitionSpec{
-			Group:   tapi.SchemeGroupVersion.Group,
-			Version: tapi.SchemeGroupVersion.Version,
+			Group:   api.SchemeGroupVersion.Group,
+			Version: api.SchemeGroupVersion.Version,
 			Scope:   extensionsobj.NamespaceScoped,
 			Names: extensionsobj.CustomResourceDefinitionNames{
-				// TODO: Use appropriate const.
-				Plural:     tapi.ResourceTypeXdb,
-				Kind:       tapi.ResourceKindXdb,
-				ShortNames: []string{tapi.ResourceCodeXdb},
+				Plural:     api.ResourceTypeRedis,
+				Kind:       api.ResourceKindRedis,
+				ShortNames: []string{api.ResourceCodeRedis},
 			},
 		},
 	}
@@ -251,18 +214,18 @@ func (c *Controller) ensureCustomResourceDefinition() {
 	}
 }
 
-func (c *Controller) pushFailureEvent(redis *tapi.Xdb, reason string) {
+func (c *Controller) pushFailureEvent(redis *api.Redis, reason string) {
 	c.recorder.Eventf(
 		redis.ObjectReference(),
 		core.EventTypeWarning,
 		eventer.EventReasonFailedToStart,
-		`Fail to be ready Xdb: "%v". Reason: %v`,
+		`Fail to be ready Redis: "%v". Reason: %v`,
 		redis.Name,
 		reason,
 	)
 
-	_, err := kutildb.TryPatchXdb(c.ExtClient, redis.ObjectMeta, func(in *tapi.Xdb) *tapi.Xdb {
-		in.Status.Phase = tapi.DatabasePhaseFailed
+	_, err := util.TryPatchRedis(c.ExtClient, redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+		in.Status.Phase = api.DatabasePhaseFailed
 		in.Status.Reason = reason
 		return in
 	})
