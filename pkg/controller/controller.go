@@ -119,6 +119,7 @@ func (c *Controller) watchRedis() {
 			AddFunc: func(obj interface{}) {
 				redis := obj.(*api.Redis)
 				util.AssignTypeKind(redis)
+				setMonitoringPort(redis)
 				if redis.Status.CreationTime == nil {
 					if err := c.create(redis); err != nil {
 						log.Errorln(err)
@@ -129,6 +130,7 @@ func (c *Controller) watchRedis() {
 			DeleteFunc: func(obj interface{}) {
 				redis := obj.(*api.Redis)
 				util.AssignTypeKind(redis)
+				setMonitoringPort(redis)
 				if err := c.pause(redis); err != nil {
 					log.Errorln(err)
 				}
@@ -144,6 +146,8 @@ func (c *Controller) watchRedis() {
 				}
 				util.AssignTypeKind(oldObj)
 				util.AssignTypeKind(newObj)
+				setMonitoringPort(oldObj)
+				setMonitoringPort(newObj)
 				if !reflect.DeepEqual(oldObj.Spec, newObj.Spec) {
 					if err := c.update(oldObj, newObj); err != nil {
 						log.Errorln(err)
@@ -153,6 +157,15 @@ func (c *Controller) watchRedis() {
 		},
 	)
 	cacheController.Run(wait.NeverStop)
+}
+
+func setMonitoringPort(redis *api.Redis) {
+	if redis.Spec.Monitor != nil &&
+		redis.Spec.Monitor.Prometheus != nil {
+		if redis.Spec.Monitor.Prometheus.Port == 0 {
+			redis.Spec.Monitor.Prometheus.Port = api.PrometheusExporterPortNumber
+		}
+	}
 }
 
 func (c *Controller) watchDeletedDatabase() {
