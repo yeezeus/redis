@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/types"
-	api "github.com/k8sdb/apimachinery/apis/kubedb/v1alpha1"
-	"github.com/k8sdb/redis/test/e2e/framework"
-	"github.com/k8sdb/redis/test/e2e/matcher"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	"github.com/kubedb/redis/test/e2e/framework"
+	"github.com/kubedb/redis/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
