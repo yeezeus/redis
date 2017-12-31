@@ -6,7 +6,6 @@
 
 
 
-
 ### Options
 
 ```
@@ -24,6 +23,7 @@
 ```
 
 ### SEE ALSO
+
 * [redis-operator run](redis-operator_run.md)	 - Run Redis in Kubernetes
 * [redis-operator version](redis-operator_version.md)	 - Prints binary version number.
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/encoding/json/types"
+	core_util "github.com/appscode/kutil/core/v1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1/util"
 	. "github.com/onsi/gomega"
@@ -22,7 +23,7 @@ func (f *Invocation) Redis() *api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version: types.StrYo("4-alpine"),
+			Version: types.StrYo("4.0.6-alpine"),
 		},
 	}
 }
@@ -37,7 +38,13 @@ func (f *Framework) GetRedis(meta metav1.ObjectMeta) (*api.Redis, error) {
 }
 
 func (f *Framework) TryPatchRedis(meta metav1.ObjectMeta, transform func(*api.Redis) *api.Redis) (*api.Redis, error) {
-	return util.TryPatchRedis(f.extClient, meta, transform)
+	redis, err := f.extClient.Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	redis, _, err = util.PatchRedis(f.extClient, redis, transform)
+	return redis, err
+
 }
 
 func (f *Framework) DeleteRedis(meta metav1.ObjectMeta) error {
@@ -72,4 +79,17 @@ func (f *Framework) EventuallyRedisRunning(meta metav1.ObjectMeta) GomegaAsyncAs
 		time.Minute*5,
 		time.Second*5,
 	)
+}
+
+func (f *Framework) CleanRedis() {
+	redisList, err := f.extClient.Redises(f.namespace).List(metav1.ListOptions{})
+	if err != nil {
+		return
+	}
+	for _, m := range redisList.Items {
+		util.PatchRedis(f.extClient, &m, func(in *api.Redis) *api.Redis {
+			in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, "kubedb.com")
+			return in
+		})
+	}
 }

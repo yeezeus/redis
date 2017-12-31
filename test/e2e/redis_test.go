@@ -45,7 +45,7 @@ var _ = Describe("Redis", func() {
 		f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
 		By("WipeOut redis")
-		_, err := f.TryPatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
+		_, err := f.PatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
 			in.Spec.WipeOut = true
 			return in
 		})
@@ -96,35 +96,35 @@ var _ = Describe("Redis", func() {
 			})
 		})
 
-		Context("DoNotPause", func() {
-			BeforeEach(func() {
-				redis.Spec.DoNotPause = true
-			})
-
-			It("should work successfully", func() {
-				// Create and wait for running Redis
-				createAndWaitForRunning()
-
-				By("Delete redis")
-				err = f.DeleteRedis(redis.ObjectMeta)
-				Expect(err).NotTo(HaveOccurred())
-
-				By("Redis is not paused. Check for redis")
-				f.EventuallyRedis(redis.ObjectMeta).Should(BeTrue())
-
-				By("Check for Running redis")
-				f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
-
-				By("Update redis to set DoNotPause=false")
-				f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
-					in.Spec.DoNotPause = false
-					return in
-				})
-
-				// Delete test resource
-				deleteTestResource()
-			})
-		})
+		//Context("DoNotPause", func() {
+		//	BeforeEach(func() {
+		//		redis.Spec.DoNotPause = true
+		//	})
+		//
+		//	It("should work successfully", func() {
+		//		// Create and wait for running Redis
+		//		createAndWaitForRunning()
+		//
+		//		By("Delete redis")
+		//		err = f.DeleteRedis(redis.ObjectMeta)
+		//		Expect(err).NotTo(HaveOccurred())
+		//
+		//		By("Redis is not paused. Check for redis")
+		//		f.EventuallyRedis(redis.ObjectMeta).Should(BeTrue())
+		//
+		//		By("Check for Running redis")
+		//		f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
+		//
+		//		By("Update redis to set DoNotPause=false")
+		//		f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+		//			in.Spec.DoNotPause = false
+		//			return in
+		//		})
+		//
+		//		// Delete test resource
+		//		deleteTestResource()
+		//	})
+		//})
 
 		Context("Resume", func() {
 			var usedInitSpec bool
@@ -142,7 +142,7 @@ var _ = Describe("Redis", func() {
 				By("Wait for redis to be paused")
 				f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
-				_, err = f.TryPatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
+				_, err = f.PatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
 					in.Spec.Resume = true
 					return in
 				})
