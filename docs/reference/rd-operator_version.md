@@ -1,26 +1,19 @@
-## redis-operator run
+## rd-operator version
 
-Run Redis in Kubernetes
+Prints binary version number.
 
 ### Synopsis
 
-Run Redis in Kubernetes
+Prints binary version number.
 
 ```
-redis-operator run [flags]
+rd-operator version [flags]
 ```
 
 ### Options
 
 ```
-      --address string             Address to listen on for web interface and telemetry. (default ":8080")
-      --docker-registry string     User provided docker repository (default "kubedb")
-      --exporter-tag string        Tag of kubedb/operator used as exporter (default "canary")
-      --governing-service string   Governing service for database statefulset (default "kubedb")
-  -h, --help                       help for run
-      --kubeconfig string          Path to kubeconfig file with authorization information (the master location is set by the master flag).
-      --master string              The address of the Kubernetes API server (overrides any value in kubeconfig)
-      --rbac                       Enable RBAC for database workloads
+  -h, --help   help for version
 ```
 
 ### Options inherited from parent commands
@@ -40,5 +33,5 @@ redis-operator run [flags]
 
 ### SEE ALSO
 
-* [redis-operator](redis-operator.md)	 - 
+* [rd-operator](rd-operator.md)	 - 
 

@@ -1,4 +1,4 @@
-## redis-operator
+## rd-operator
 
 
 
@@ -11,7 +11,7 @@
 ```
       --alsologtostderr                  log to standard error as well as files
       --analytics                        Send analytical events to Google Analytics (default true)
-  -h, --help                             help for redis-operator
+  -h, --help                             help for rd-operator
       --log.format logFormatFlag         Set the log target and format. Example: "logger:syslog?appname=bob&local=7" or "logger:stdout?json=true" (default "logger:stderr")
       --log.level levelFlag              Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal] (default "info")
       --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
@@ -24,6 +24,6 @@
 
 ### SEE ALSO
 
-* [redis-operator run](redis-operator_run.md)	 - Run Redis in Kubernetes
-* [redis-operator version](redis-operator_version.md)	 - Prints binary version number.
+* [rd-operator run](rd-operator_run.md)	 - Run Redis in Kubernetes
+* [rd-operator version](rd-operator_version.md)	 - Prints binary version number.
 
