@@ -23,7 +23,7 @@ func (f *Invocation) Redis() *api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version: types.StrYo("4.0.6-alpine"),
+			Version: types.StrYo("4.0"),
 		},
 	}
 }
