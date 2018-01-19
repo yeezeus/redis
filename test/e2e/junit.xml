@@ -1,4 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <testsuite tests="2" failures="0" time="98.804455497">
-      <testcase name="Redis Test General - should run successfully" classname="e2e Suite" time="90.096466332"></testcase>
-  </testsuite>
+  <testsuite tests="1" failures="0" time="54.403271012"></testsuite>

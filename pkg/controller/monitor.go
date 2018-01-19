@@ -71,11 +71,10 @@ func (c *Controller) setNewAgent(redis *api.Redis) error {
 func (c *Controller) manageMonitor(redis *api.Redis) error {
 	oldAgent := c.getOldAgent(redis)
 	if redis.Spec.Monitor != nil {
-		if oldAgent != nil {
-			if oldAgent.GetType() != redis.Spec.Monitor.Agent {
-				if _, err := oldAgent.Delete(redis.StatsAccessor()); err != nil {
-					log.Debugf("error in deleting Prometheus agent:", err)
-				}
+		if oldAgent != nil &&
+			oldAgent.GetType() != redis.Spec.Monitor.Agent {
+			if _, err := oldAgent.Delete(redis.StatsAccessor()); err != nil {
+				log.Error("error in deleting Prometheus agent:", err)
 			}
 		}
 		if _, err := c.addOrUpdateMonitor(redis); err != nil {
@@ -84,7 +83,7 @@ func (c *Controller) manageMonitor(redis *api.Redis) error {
 		return c.setNewAgent(redis)
 	} else if oldAgent != nil {
 		if _, err := oldAgent.Delete(redis.StatsAccessor()); err != nil {
-			log.Debugf("error in deleting Prometheus agent:", err)
+			log.Error("error in deleting Prometheus agent:", err)
 		}
 	}
 	return nil
