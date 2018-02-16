@@ -133,9 +133,8 @@ func (c *Controller) checkStatefulSet(redis *api.Redis) error {
 	if err != nil {
 		if kerr.IsNotFound(err) {
 			return nil
-		} else {
-			return err
 		}
+		return err
 	}
 
 	if statefulSet.Labels[api.LabelDatabaseKind] != api.ResourceKindRedis {

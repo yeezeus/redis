@@ -88,7 +88,7 @@ func (f *Framework) CleanRedis() {
 	}
 	for _, m := range redisList.Items {
 		util.PatchRedis(f.extClient, &m, func(in *api.Redis) *api.Redis {
-			in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, "kubedb.com")
+			in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, api.GenericKey)
 			return in
 		})
 	}
