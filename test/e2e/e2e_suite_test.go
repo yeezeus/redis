@@ -11,7 +11,7 @@ import (
 	logs "github.com/appscode/go/log/golog"
 	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
-	cs "github.com/kubedb/apimachinery/client/typed/kubedb/v1alpha1"
+	cs "github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1"
 	"github.com/kubedb/redis/pkg/controller"
 	"github.com/kubedb/redis/pkg/docker"
 	"github.com/kubedb/redis/test/e2e/framework"
