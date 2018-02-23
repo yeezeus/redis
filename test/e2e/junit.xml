@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <testsuite tests="1" failures="0" time="54.403271012"></testsuite>
+  <testsuite tests="1" failures="0" time="62.920061794">
+      <testcase name="Redis Test General - should run successfully" classname="e2e Suite" time="0">
+          <skipped></skipped>
+      </testcase>
+      <testcase name="Redis Test General With PVC should run successfully" classname="e2e Suite" time="0">
+          <skipped></skipped>
+      </testcase>
+      <testcase name="Redis Test Resume - should resume DormantDatabase successfully" classname="e2e Suite" time="0">
+          <skipped></skipped>
+      </testcase>
+      <testcase name="Redis Test Resume With original Redis should resume DormantDatabase successfully" classname="e2e Suite" time="57.023103102"></testcase>
+      <testcase name="Redis Test Resume With original Redis Multiple times with PVC should resume DormantDatabase successfully" classname="e2e Suite" time="0">
+          <skipped></skipped>
+      </testcase>
+  </testsuite>
