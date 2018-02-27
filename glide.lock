@@ -1,5 +1,5 @@
 hash: fe8f31718d8730f6629ab459f4b98d4980cf54e0dfb357fcfc32dd4e6aee5022
-updated: 2018-02-26T11:20:29.091349876+06:00
+updated: 2018-02-27T12:51:21.684590583+06:00
 imports:
 - name: cloud.google.com/go
   version: fe3d41e1ecb2ce36ad3a979037c9b9a2b726226f
@@ -30,10 +30,10 @@ imports:
   - agents/prometheusbuiltin
   - api
 - name: github.com/appscode/kutil
-  version: 20ffc2be6a1d88387bc6f6babe7bfe312c58b509
+  version: 6a5c108367b50c78b783e51490f015d03ce62259
   subpackages:
   - apiextensions/v1beta1
-  - apps/v1beta1
+  - apps/v1
   - core/v1
   - meta
   - tools/analytics
@@ -120,7 +120,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 6aced65f8501fe1217321abf0749d354824ba2ff
+  version: 7abd5745472fff5eb3685386d5fb8bf38683154d
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/gogo/protobuf
@@ -200,7 +200,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kubedb/apimachinery
-  version: 8a7e329dba5f46d6162eeb9ffd525308a7caa20c
+  version: 37caef566d41ed47313b44975186c335dde08123
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
