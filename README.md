@@ -1,7 +1,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/kubedb/redis)](https://goreportcard.com/report/github.com/kubedb/redis)
 [![Build Status](https://travis-ci.org/kubedb/redis.svg?branch=master)](https://travis-ci.org/kubedb/redis)
 [![codecov](https://codecov.io/gh/kubedb/redis/branch/master/graph/badge.svg)](https://codecov.io/gh/kubedb/redis)
-[![Slack](http://slack.kubernetes.io/badge.svg)](http://slack.kubernetes.io)
+[![Slack](http://slack.kubernetes.io/badge.svg)](http://slack.kubernetes.io/#kubedb)
 [![mailing list](https://img.shields.io/badge/mailing_list-join-blue.svg)](https://groups.google.com/forum/#!forum/kubedb)
 [![Twitter](https://img.shields.io/twitter/follow/kubedb.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/intent/follow?screen_name=kubedb)
 
