@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-  <testsuite tests="4" failures="0" time="343.372706952">
-      <testcase name="Redis Test General - should run successfully" classname="e2e Suite" time="100.051802604"></testcase>
-      <testcase name="Redis Test General With PVC should run successfully" classname="e2e Suite" time="67.556045497"></testcase>
-      <testcase name="Redis Test Resume - should resume DormantDatabase successfully" classname="e2e Suite" time="110.783768418"></testcase>
-  </testsuite>

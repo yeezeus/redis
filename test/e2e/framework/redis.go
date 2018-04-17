@@ -1,11 +1,11 @@
 package framework
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/encoding/json/types"
-	core_util "github.com/appscode/kutil/core/v1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 	. "github.com/onsi/gomega"
@@ -44,7 +44,6 @@ func (f *Framework) TryPatchRedis(meta metav1.ObjectMeta, transform func(*api.Re
 	}
 	redis, _, err = util.PatchRedis(f.extClient, redis, transform)
 	return redis, err
-
 }
 
 func (f *Framework) DeleteRedis(meta metav1.ObjectMeta) error {
@@ -58,9 +57,8 @@ func (f *Framework) EventuallyRedis(meta metav1.ObjectMeta) GomegaAsyncAssertion
 			if err != nil {
 				if kerr.IsNotFound(err) {
 					return false
-				} else {
-					Expect(err).NotTo(HaveOccurred())
 				}
+				Expect(err).NotTo(HaveOccurred())
 			}
 			return true
 		},
@@ -86,10 +84,15 @@ func (f *Framework) CleanRedis() {
 	if err != nil {
 		return
 	}
-	for _, m := range redisList.Items {
-		util.PatchRedis(f.extClient, &m, func(in *api.Redis) *api.Redis {
-			in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, api.GenericKey)
+	for _, e := range redisList.Items {
+		if _, _, err := util.PatchRedis(f.extClient, &e, func(in *api.Redis) *api.Redis {
+			in.ObjectMeta.Finalizers = nil
 			return in
-		})
+		}); err != nil {
+			fmt.Printf("error Patching Redis. error: %v", err)
+		}
+	}
+	if err := f.extClient.Redises(f.namespace).DeleteCollection(deleteInBackground(), metav1.ListOptions{}); err != nil {
+		fmt.Printf("error in deletion of Redis. Error: %v", err)
 	}
 }

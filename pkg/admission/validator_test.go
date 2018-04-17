@@ -222,7 +222,7 @@ func sampleRedis() api.Redis {
 		Spec: api.RedisSpec{
 			Version:    "4",
 			DoNotPause: true,
-			Replicas: types.Int32P(1),
+			Replicas:   types.Int32P(1),
 			Storage: &core.PersistentVolumeClaimSpec{
 				StorageClassName: types.StringP("standard"),
 				Resources: core.ResourceRequirements{

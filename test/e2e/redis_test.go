@@ -51,11 +51,12 @@ var _ = Describe("Redis", func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
-		By("Wait for redis to be wipedOut")
-		f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HaveWipedOut())
-
+		By("Delete Dormant Database")
 		err = f.DeleteDormantDatabase(redis.ObjectMeta)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("Wait for redis resources to be wipedOut")
+		f.EventuallyWipedOut(redis.ObjectMeta).Should(Succeed())
 	}
 
 	var shouldSuccessfullyRunning = func() {
@@ -71,60 +72,64 @@ var _ = Describe("Redis", func() {
 	}
 
 	Describe("Test", func() {
+		BeforeEach(func() {
+			if f.StorageClass == "" {
+				Skip("Missing StorageClassName. Provide as flag to test this.")
+			}
+			redis.Spec.Storage = &core.PersistentVolumeClaimSpec{
+				Resources: core.ResourceRequirements{
+					Requests: core.ResourceList{
+						core.ResourceStorage: resource.MustParse("1Gi"),
+					},
+				},
+				StorageClassName: types.StringP(f.StorageClass),
+			}
+
+		})
 
 		Context("General", func() {
 
-			Context("-", func() {
+			Context("Without PVC", func() {
+				BeforeEach(func() {
+					redis.Spec.Storage = nil
+				})
 				It("should run successfully", shouldSuccessfullyRunning)
 			})
 
 			Context("With PVC", func() {
-				BeforeEach(func() {
-					if f.StorageClass == "" {
-						skipMessage = "Missing StorageClassName. Provide as flag to test this."
-					}
-					redis.Spec.Storage = &core.PersistentVolumeClaimSpec{
-						Resources: core.ResourceRequirements{
-							Requests: core.ResourceList{
-								core.ResourceStorage: resource.MustParse("100Mi"),
-							},
-						},
-						StorageClassName: types.StringP(f.StorageClass),
-					}
-				})
 				It("should run successfully", shouldSuccessfullyRunning)
 			})
 		})
 
-		//Context("DoNotPause", func() {
-		//	BeforeEach(func() {
-		//		redis.Spec.DoNotPause = true
-		//	})
-		//
-		//	It("should work successfully", func() {
-		//		// Create and wait for running Redis
-		//		createAndWaitForRunning()
-		//
-		//		By("Delete redis")
-		//		err = f.DeleteRedis(redis.ObjectMeta)
-		//		Expect(err).NotTo(HaveOccurred())
-		//
-		//		By("Redis is not paused. Check for redis")
-		//		f.EventuallyRedis(redis.ObjectMeta).Should(BeTrue())
-		//
-		//		By("Check for Running redis")
-		//		f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
-		//
-		//		By("Update redis to set DoNotPause=false")
-		//		f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
-		//			in.Spec.DoNotPause = false
-		//			return in
-		//		})
-		//
-		//		// Delete test resource
-		//		deleteTestResource()
-		//	})
-		//})
+		Context("DoNotPause", func() {
+			BeforeEach(func() {
+				redis.Spec.DoNotPause = true
+			})
+
+			It("should work successfully", func() {
+				// Create and wait for running Redis
+				createAndWaitForRunning()
+
+				By("Delete redis")
+				err = f.DeleteRedis(redis.ObjectMeta)
+				Expect(err).Should(HaveOccurred())
+
+				By("Redis is not paused. Check for redis")
+				f.EventuallyRedis(redis.ObjectMeta).Should(BeTrue())
+
+				By("Check for Running redis")
+				f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
+
+				By("Update redis to set DoNotPause=false")
+				f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+					in.Spec.DoNotPause = false
+					return in
+				})
+
+				// Delete test resource
+				deleteTestResource()
+			})
+		})
 
 		Context("Resume", func() {
 			var usedInitSpec bool
@@ -132,40 +137,48 @@ var _ = Describe("Redis", func() {
 				usedInitSpec = false
 			})
 
-			var shouldResumeSuccessfully = func() {
-				// Create and wait for running Redis
-				createAndWaitForRunning()
+			Context("Super Fast User - Create-Delete-Create-Delete-Create ", func() {
+				It("should resume DormantDatabase successfully", func() {
+					// Create and wait for running Redis
+					createAndWaitForRunning()
 
-				By("Delete redis")
-				f.DeleteRedis(redis.ObjectMeta)
+					By("Delete redis")
+					err = f.DeleteRedis(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
 
-				By("Wait for redis to be paused")
-				f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
+					By("Wait for redis to be paused")
+					f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
-				_, err = f.PatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
-					in.Spec.Resume = true
-					return in
+					// Create Redis object again to resume it
+					By("Create Redis: " + redis.Name)
+					err = f.CreateRedis(redis)
+					Expect(err).NotTo(HaveOccurred())
+
+					// Delete without caring if DB is resumed
+					By("Delete redis")
+					err = f.DeleteRedis(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
+
+					// Create Redis object again to resume it
+					By("Create Redis: " + redis.Name)
+					err = f.CreateRedis(redis)
+					Expect(err).NotTo(HaveOccurred())
+
+					By("Wait for DormantDatabase to be deleted")
+					f.EventuallyDormantDatabase(redis.ObjectMeta).Should(BeFalse())
+
+					By("Wait for Running redis")
+					f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
+
+					_, err = f.GetRedis(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
+
+					// Delete test resource
+					deleteTestResource()
 				})
-				Expect(err).NotTo(HaveOccurred())
-
-				By("Wait for DormantDatabase to be deleted")
-				f.EventuallyDormantDatabase(redis.ObjectMeta).Should(BeFalse())
-
-				By("Wait for Running redis")
-				f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
-
-				redis, err = f.GetRedis(redis.ObjectMeta)
-				Expect(err).NotTo(HaveOccurred())
-
-				// Delete test resource
-				deleteTestResource()
-			}
-
-			Context("-", func() {
-				It("should resume DormantDatabase successfully", shouldResumeSuccessfully)
 			})
 
-			Context("With original Redis", func() {
+			Context("Basic Resume", func() {
 				It("should resume DormantDatabase successfully", func() {
 					// Create and wait for running Redis
 					createAndWaitForRunning()
@@ -192,54 +205,38 @@ var _ = Describe("Redis", func() {
 					// Delete test resource
 					deleteTestResource()
 				})
+			})
 
-				Context("Multiple times with PVC", func() {
-					BeforeEach(func() {
-						if f.StorageClass == "" {
-							skipMessage = "Missing StorageClassName. Provide as flag to test this."
-						}
-						redis.Spec.Storage = &core.PersistentVolumeClaimSpec{
-							Resources: core.ResourceRequirements{
-								Requests: core.ResourceList{
-									core.ResourceStorage: resource.MustParse("100Mi"),
-								},
-							},
-							StorageClassName: types.StringP(f.StorageClass),
-						}
-					})
+			Context("Multiple times with PVC", func() {
+				It("should resume DormantDatabase successfully", func() {
+					// Create and wait for running Redis
+					createAndWaitForRunning()
 
-					By("Using a false init script.")
+					for i := 0; i < 3; i++ {
+						By(fmt.Sprintf("%v-th", i+1) + " time running.")
+						By("Delete redis")
+						f.DeleteRedis(redis.ObjectMeta)
 
-					It("should resume DormantDatabase successfully", func() {
-						// Create and wait for running Redis
-						createAndWaitForRunning()
+						By("Wait for redis to be paused")
+						f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
-						for i := 0; i < 3; i++ {
-							By(fmt.Sprintf("%v-th", i+1) + " time running.")
-							By("Delete redis")
-							f.DeleteRedis(redis.ObjectMeta)
+						// Create Redis object again to resume it
+						By("Create Redis: " + redis.Name)
+						err = f.CreateRedis(redis)
+						Expect(err).NotTo(HaveOccurred())
 
-							By("Wait for redis to be paused")
-							f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
+						By("Wait for DormantDatabase to be deleted")
+						f.EventuallyDormantDatabase(redis.ObjectMeta).Should(BeFalse())
 
-							// Create Redis object again to resume it
-							By("Create Redis: " + redis.Name)
-							err = f.CreateRedis(redis)
-							Expect(err).NotTo(HaveOccurred())
+						By("Wait for Running redis")
+						f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
 
-							By("Wait for DormantDatabase to be deleted")
-							f.EventuallyDormantDatabase(redis.ObjectMeta).Should(BeFalse())
+						_, err := f.GetRedis(redis.ObjectMeta)
+						Expect(err).NotTo(HaveOccurred())
+					}
 
-							By("Wait for Running redis")
-							f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
-
-							_, err := f.GetRedis(redis.ObjectMeta)
-							Expect(err).NotTo(HaveOccurred())
-						}
-
-						// Delete test resource
-						deleteTestResource()
-					})
+					// Delete test resource
+					deleteTestResource()
 				})
 			})
 		})
