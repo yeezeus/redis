@@ -85,19 +85,6 @@ func (f *Framework) EventuallyWipedOut(meta metav1.ObjectMeta) GomegaAsyncAssert
 				return fmt.Errorf("PVCs have not wiped out yet")
 			}
 
-			// check if snapshot is wiped out
-			snapshotList, err := f.extClient.Snapshots(meta.Namespace).List(
-				metav1.ListOptions{
-					LabelSelector: labelSelector.String(),
-				},
-			)
-			if err != nil {
-				return err
-			}
-			if len(snapshotList.Items) > 0 {
-				return fmt.Errorf("all snapshots have not wiped out yet")
-			}
-
 			// check if secrets are wiped out
 			secretList, err := f.kubeClient.CoreV1().Secrets(meta.Namespace).List(
 				metav1.ListOptions{

@@ -256,6 +256,9 @@ func editStatus(old api.Redis) api.Redis {
 func editSpecMonitor(old api.Redis) api.Redis {
 	old.Spec.Monitor = &kubeMon.AgentSpec{
 		Agent: kubeMon.AgentPrometheusBuiltin,
+		Prometheus: &kubeMon.PrometheusSpec{
+			Port: 4567,
+		},
 	}
 	return old
 }
