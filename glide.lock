@@ -1,5 +1,5 @@
-hash: 41d6d45a44b2eb5b82341ad0313c0c7c1a962130ca2026bf57bcc52c6317aa00
-updated: 2018-05-04T09:31:12.451654241-07:00
+hash: a61a04289638249236d60fb659310546c2021a12c6c44d9376b9ebf6617d2536
+updated: 2018-05-04T09:47:41.123350377-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -186,7 +186,7 @@ imports:
   - daemon
   - journal
 - name: github.com/coreos/prometheus-operator
-  version: a1c26060308c9a7798d2900a9ec5f37d3e4eb42c
+  version: 0608eb688913e3c2523bb503fc8ab76c771e4018
   repo: https://github.com/tamalsaha/prometheus-operator.git
   subpackages:
   - pkg/client/monitoring/v1
