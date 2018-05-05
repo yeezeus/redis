@@ -32,6 +32,7 @@ func NewRedisServerOptions(out, errOut io.Writer) *RedisServerOptions {
 		StdErr:             errOut,
 	}
 	o.RecommendedOptions.Etcd = nil
+	o.RecommendedOptions.Admission = nil
 
 	return o
 }
