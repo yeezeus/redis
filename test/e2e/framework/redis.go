@@ -87,6 +87,7 @@ func (f *Framework) CleanRedis() {
 	for _, e := range redisList.Items {
 		if _, _, err := util.PatchRedis(f.extClient, &e, func(in *api.Redis) *api.Redis {
 			in.ObjectMeta.Finalizers = nil
+			in.Spec.DoNotPause = false
 			return in
 		}); err != nil {
 			fmt.Printf("error Patching Redis. error: %v", err)
