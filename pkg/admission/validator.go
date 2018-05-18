@@ -132,11 +132,8 @@ func ValidateRedis(client kubernetes.Interface, extClient kubedbv1alpha1.KubedbV
 		return fmt.Errorf(`spec.replicas "%v" invalid. Value must be one`, redis.Spec.Replicas)
 	}
 
-	if redis.Spec.Storage != nil {
-		var err error
-		if err = amv.ValidateStorage(client, redis.Spec.Storage); err != nil {
-			return err
-		}
+	if err := amv.ValidateStorage(client, redis.Spec.Storage); err != nil {
+		return err
 	}
 
 	monitorSpec := redis.Spec.Monitor

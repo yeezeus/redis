@@ -5,11 +5,14 @@ import (
 	"time"
 
 	"github.com/appscode/go/crypto/rand"
-	"github.com/appscode/go/encoding/json/types"
+	jsonTypes "github.com/appscode/go/encoding/json/types"
+	"github.com/appscode/go/types"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 	. "github.com/onsi/gomega"
+	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -23,7 +26,15 @@ func (f *Invocation) Redis() *api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version: types.StrYo("4.0"),
+			Version: jsonTypes.StrYo("4.0"),
+			Storage: core.PersistentVolumeClaimSpec{
+				Resources: core.ResourceRequirements{
+					Requests: core.ResourceList{
+						core.ResourceStorage: resource.MustParse("1Gi"),
+					},
+				},
+				StorageClassName: types.StringP(f.StorageClass),
+			},
 		},
 	}
 }

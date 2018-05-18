@@ -3,14 +3,11 @@ package e2e_test
 import (
 	"fmt"
 
-	"github.com/appscode/go/types"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/redis/test/e2e/framework"
 	"github.com/kubedb/redis/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	core "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var _ = Describe("Redis", func() {
@@ -72,31 +69,10 @@ var _ = Describe("Redis", func() {
 	}
 
 	Describe("Test", func() {
-		BeforeEach(func() {
-			if f.StorageClass == "" {
-				Skip("Missing StorageClassName. Provide as flag to test this.")
-			}
-			redis.Spec.Storage = &core.PersistentVolumeClaimSpec{
-				Resources: core.ResourceRequirements{
-					Requests: core.ResourceList{
-						core.ResourceStorage: resource.MustParse("1Gi"),
-					},
-				},
-				StorageClassName: types.StringP(f.StorageClass),
-			}
-
-		})
 
 		Context("General", func() {
 
-			Context("Without PVC", func() {
-				BeforeEach(func() {
-					redis.Spec.Storage = nil
-				})
-				It("should run successfully", shouldSuccessfullyRunning)
-			})
-
-			Context("With PVC", func() {
+			Context("-", func() {
 				It("should run successfully", shouldSuccessfullyRunning)
 			})
 		})
@@ -158,6 +134,9 @@ var _ = Describe("Redis", func() {
 					By("Delete redis")
 					err = f.DeleteRedis(redis.ObjectMeta)
 					Expect(err).NotTo(HaveOccurred())
+
+					By("Wait for Redis to be paused")
+					f.EventuallyRedis(redis.ObjectMeta).Should(BeFalse())
 
 					// Create Redis object again to resume it
 					By("Create Redis: " + redis.Name)
