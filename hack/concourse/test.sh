@@ -98,5 +98,5 @@ kubectl get storageclass
 pushd $GOPATH/src/github.com/kubedb/redis
 
 # run tests
-source ./hack/deploy/setup.sh --docker-registry=kubedbci
+source ./hack/deploy/make.sh --docker-registry=kubedbci
 ./hack/make.py test e2e --v=1 --storageclass=standard --selfhosted-operator=true
