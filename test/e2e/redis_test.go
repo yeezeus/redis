@@ -3,11 +3,14 @@ package e2e_test
 import (
 	"fmt"
 
+	exec_util "github.com/appscode/kutil/tools/exec"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 	"github.com/kubedb/redis/test/e2e/framework"
 	"github.com/kubedb/redis/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	core "k8s.io/api/core/v1"
 )
 
 var _ = Describe("Redis", func() {
@@ -218,6 +221,57 @@ var _ = Describe("Redis", func() {
 					deleteTestResource()
 				})
 			})
+		})
+
+		Context("Environment Variables", func() {
+			AfterEach(func() {
+				deleteTestResource()
+			})
+			envList := []core.EnvVar{
+				{
+					Name:  "TEST_ENV",
+					Value: "kubedb-redis-e2e",
+				},
+			}
+
+			Context("Allowed Envs", func() {
+				It("should run successfully with given Env", func() {
+					redis.Spec.Env = envList
+					createAndWaitForRunning()
+
+					By("Checking pod started with given envs")
+					pod, err := f.GetPod(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
+
+					out, err := exec_util.ExecIntoPod(f.RestConfig(), pod, "env")
+					Expect(err).NotTo(HaveOccurred())
+					for _, env := range envList {
+						Expect(out).Should(ContainSubstring(env.Name + "=" + env.Value))
+					}
+
+				})
+			})
+
+			Context("Update Envs", func() {
+				It("should reject to update Env", func() {
+					redis.Spec.Env = envList
+					createAndWaitForRunning()
+
+					By("Updating Envs")
+					_, _, err := util.PatchRedis(f.ExtClient(), redis, func(in *api.Redis) *api.Redis {
+						in.Spec.Env = []core.EnvVar{
+							{
+								Name:  "TEST_ENV",
+								Value: "patched",
+							},
+						}
+						return in
+					})
+
+					Expect(err).To(HaveOccurred())
+				})
+			})
+
 		})
 
 	})
