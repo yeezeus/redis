@@ -227,6 +227,7 @@ var _ = Describe("Redis", func() {
 			AfterEach(func() {
 				deleteTestResource()
 			})
+
 			envList := []core.EnvVar{
 				{
 					Name:  "TEST_ENV",
@@ -274,5 +275,62 @@ var _ = Describe("Redis", func() {
 
 		})
 
+		Context("Custom config", func() {
+
+			customConfigs := []string{
+				"databases 10",
+				"maxclients 500",
+			}
+
+			Context("from configMap", func() {
+				var (
+					userConfig *core.ConfigMap
+					testSvc    *core.Service
+				)
+
+				BeforeEach(func() {
+					userConfig = f.GetCustomConfig(customConfigs)
+					testSvc = f.GetTestService(redis.ObjectMeta)
+
+					By("Creating Service: " + testSvc.Name)
+					f.CreateService(testSvc)
+				})
+
+				AfterEach(func() {
+					By("Deleting configMap: " + userConfig.Name)
+					f.DeleteConfigMap(userConfig.ObjectMeta)
+
+					By("Deleting Service: " + testSvc.Name)
+					f.DeleteService(testSvc.ObjectMeta)
+				})
+
+				It("should set configuration provided in configMap", func() {
+					if skipMessage != "" {
+						Skip(skipMessage)
+					}
+
+					By("Creating configMap: " + userConfig.Name)
+					err := f.CreateConfigMap(userConfig)
+					Expect(err).NotTo(HaveOccurred())
+
+					redis.Spec.ConfigSource = &core.VolumeSource{
+						ConfigMap: &core.ConfigMapVolumeSource{
+							LocalObjectReference: core.LocalObjectReference{
+								Name: userConfig.Name,
+							},
+						},
+					}
+
+					// Create Redis
+					createAndWaitForRunning()
+
+					By("Checking redis configured from provided custom configuration")
+					for _, cfg := range customConfigs {
+						f.EventuallyRedisConfig(redis.ObjectMeta, cfg).Should(matcher.UseCustomConfig(cfg))
+					}
+				})
+			})
+
+		})
 	})
 })
