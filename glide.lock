@@ -1,5 +1,5 @@
 hash: a754fed47abec03bc7ec478320d2662af478a17675354d16e71a3cdfc08f4c80
-updated: 2018-08-01T19:13:11.560604599-07:00
+updated: 2018-08-04T16:38:58.435085002-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -32,7 +32,7 @@ imports:
   - admission/v1beta1
   - registry/admissionreview/v1beta1
 - name: github.com/appscode/kutil
-  version: c9b929cfcab96c233c1b0ab59cd4a5ab6a4ff96a
+  version: d31eda1052245a20fb5757fbf12c6c8ace8a12a7
   subpackages:
   - apiextensions/v1beta1
   - apps/v1
@@ -224,7 +224,7 @@ imports:
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/go-redis/redis
-  version: 7e6413d4675d151fe8fbd067779f58f9dc3b2128
+  version: af03c6a149e5b8d74bc270774a1e891b126be4a1
   subpackages:
   - internal
   - internal/consistenthash
@@ -312,7 +312,7 @@ imports:
 - name: github.com/json-iterator/go
   version: f2b4162afba35581b6d4a50d3b8f34e33c144682
 - name: github.com/kubedb/apimachinery
-  version: 883ae26a8ff0a28ffc2c36ba7c34f2532cefae21
+  version: 326a335effbcb4e17454c94c6201cf7bfdafdfb8
   subpackages:
   - apis/kubedb
   - apis/kubedb/v1alpha1
@@ -511,7 +511,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 31ca0e01cd791f07750cb23fc99327721f753290
+  version: f6d94689cbd71030af1108ddac733886fcae1d75
   subpackages:
   - gensupport
   - googleapi
@@ -663,7 +663,7 @@ imports:
   - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: 79540596e3b2021b528c4c147fb78cebc29a2f75
+  version: bf4767929ee604e8b2a6ca0322c2b6f12fd6c912
   repo: https://github.com/pharmer/apiserver.git
   vcs: git
   subpackages:
@@ -952,7 +952,6 @@ imports:
   - agents
   - agents/coreosprometheusoperator
   - agents/prometheusbuiltin
-  - api
   - api/v1
 - name: kmodules.xyz/objectstore-api
   version: 5437829d6e1c97de1c3effe5f2dc6cbca2e0bfd4
@@ -962,7 +961,7 @@ imports:
   - api/v1
   - osm
 - name: kmodules.xyz/offshoot-api
-  version: ca509dced59191f2fe70d49a5e238ec92016a8eb
+  version: daec3814cefd06bcb6ca0611ce28df8b92337d8c
   repo: https://github.com/kmodules/offshoot-api.git
   vcs: git
   subpackages:

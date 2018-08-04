@@ -50,7 +50,6 @@ func (c *Controller) runRedis(key string) error {
 		redis := obj.(*api.Redis).DeepCopy()
 		if redis.DeletionTimestamp != nil {
 			if core_util.HasFinalizer(redis.ObjectMeta, api.GenericKey) {
-				util.AssignTypeKind(redis)
 				if err := c.pause(redis); err != nil {
 					log.Errorln(err)
 					return err
@@ -69,7 +68,6 @@ func (c *Controller) runRedis(key string) error {
 			if err != nil {
 				return err
 			}
-			util.AssignTypeKind(redis)
 			if err := c.create(redis); err != nil {
 				log.Errorln(err)
 				c.pushFailureEvent(redis, err.Error())

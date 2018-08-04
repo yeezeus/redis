@@ -78,9 +78,9 @@ func (c *Controller) createService(redis *api.Redis) (kutil.VerbType, error) {
 
 	_, ok, err := core_util.CreateOrPatchService(c.Client, meta, func(in *core.Service) *core.Service {
 		in.ObjectMeta = core_util.EnsureOwnerReference(in.ObjectMeta, ref)
-		in.Labels = redis.OffshootLabels()
+		in.Labels = redis.OffshootSelectors()
 		in.Spec.Ports = upsertServicePort(in, redis)
-		in.Spec.Selector = redis.OffshootLabels()
+		in.Spec.Selector = redis.OffshootSelectors()
 		return in
 	})
 	return ok, err
