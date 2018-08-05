@@ -79,8 +79,22 @@ func (c *Controller) createService(redis *api.Redis) (kutil.VerbType, error) {
 	_, ok, err := core_util.CreateOrPatchService(c.Client, meta, func(in *core.Service) *core.Service {
 		in.ObjectMeta = core_util.EnsureOwnerReference(in.ObjectMeta, ref)
 		in.Labels = redis.OffshootSelectors()
-		in.Spec.Ports = upsertServicePort(in, redis)
+		in.Annotations = redis.Spec.ServiceTemplate.Annotations
+
 		in.Spec.Selector = redis.OffshootSelectors()
+		in.Spec.Ports = upsertServicePort(in, redis)
+
+		if redis.Spec.ServiceTemplate.Spec.ClusterIP != "" {
+			in.Spec.ClusterIP = redis.Spec.ServiceTemplate.Spec.ClusterIP
+		}
+		if redis.Spec.ServiceTemplate.Spec.Type != "" {
+			in.Spec.Type = redis.Spec.ServiceTemplate.Spec.Type
+		}
+		in.Spec.ExternalIPs = redis.Spec.ServiceTemplate.Spec.ExternalIPs
+		in.Spec.LoadBalancerIP = redis.Spec.ServiceTemplate.Spec.LoadBalancerIP
+		in.Spec.LoadBalancerSourceRanges = redis.Spec.ServiceTemplate.Spec.LoadBalancerSourceRanges
+		in.Spec.ExternalTrafficPolicy = redis.Spec.ServiceTemplate.Spec.ExternalTrafficPolicy
+		in.Spec.HealthCheckNodePort = redis.Spec.ServiceTemplate.Spec.HealthCheckNodePort
 		return in
 	})
 	return ok, err
