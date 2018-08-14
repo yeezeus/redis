@@ -38,7 +38,13 @@ func TestRedisValidator_Admit(t *testing.T) {
 			validator := RedisValidator{}
 
 			validator.initialized = true
-			validator.extClient = extFake.NewSimpleClientset()
+			validator.extClient = extFake.NewSimpleClientset(
+				&api.RedisVersion{
+					ObjectMeta: metaV1.ObjectMeta{
+						Name: "4.0",
+					},
+				},
+			)
 			validator.client = fake.NewSimpleClientset(
 				&storageV1beta1.StorageClass{
 					ObjectMeta: metaV1.ObjectMeta{
@@ -220,7 +226,7 @@ func sampleRedis() api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version:    "4",
+			Version:    "4.0",
 			DoNotPause: true,
 			Replicas:   types.Int32P(1),
 			Storage: core.PersistentVolumeClaimSpec{

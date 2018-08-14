@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eou pipefail
 
-crds=(redises snapshots dormantdatabases)
+crds=(redises redisversions snapshots dormantdatabases)
 
 export KUBEDB_UNINSTALL=0
 export KUBEDB_PURGE=0

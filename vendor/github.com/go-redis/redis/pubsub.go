@@ -62,7 +62,7 @@ func (c *PubSub) _conn(newChannels []string) (*pool.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	cn.WB.AllocBuffer()
+	cn.EnableConcurrentReadWrite()
 
 	if err := c.resubscribe(cn); err != nil {
 		_ = c.closeConn(cn)
@@ -131,22 +131,25 @@ func (c *PubSub) _releaseConn(cn *pool.Conn, err error, allowTimeout bool) {
 		return
 	}
 	if internal.IsBadConn(err, allowTimeout) {
-		c._reconnect()
+		c._reconnect(err)
 	}
 }
 
-func (c *PubSub) _closeTheCn() error {
-	var err error
-	if c.cn != nil {
-		err = c.closeConn(c.cn)
-		c.cn = nil
-	}
-	return err
-}
-
-func (c *PubSub) _reconnect() {
-	_ = c._closeTheCn()
+func (c *PubSub) _reconnect(reason error) {
+	_ = c._closeTheCn(reason)
 	_, _ = c._conn(nil)
+}
+
+func (c *PubSub) _closeTheCn(reason error) error {
+	if c.cn == nil {
+		return nil
+	}
+	if !c.closed {
+		internal.Logf("redis: discarding bad PubSub connection: %s", reason)
+	}
+	err := c.closeConn(c.cn)
+	c.cn = nil
+	return err
 }
 
 func (c *PubSub) Close() error {
@@ -159,7 +162,7 @@ func (c *PubSub) Close() error {
 	c.closed = true
 	close(c.exit)
 
-	err := c._closeTheCn()
+	err := c._closeTheCn(pool.ErrClosed)
 	return err
 }
 
@@ -432,22 +435,23 @@ func (c *PubSub) initChannel() {
 		timer := time.NewTimer(timeout)
 		timer.Stop()
 
-		var hasPing bool
+		healthy := true
+		var pingErr error
 		for {
 			timer.Reset(timeout)
 			select {
 			case <-c.ping:
-				hasPing = true
+				healthy = true
 				if !timer.Stop() {
 					<-timer.C
 				}
 			case <-timer.C:
-				if hasPing {
-					hasPing = false
-					_ = c.Ping()
+				pingErr = c.Ping()
+				if healthy {
+					healthy = false
 				} else {
 					c.mu.Lock()
-					c._reconnect()
+					c._reconnect(pingErr)
 					c.mu.Unlock()
 				}
 			case <-c.exit:

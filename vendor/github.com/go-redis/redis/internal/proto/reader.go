@@ -1,7 +1,6 @@
 package proto
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"strconv"
@@ -32,10 +31,10 @@ func (e RedisError) Error() string { return string(e) }
 type MultiBulkParse func(*Reader, int64) (interface{}, error)
 
 type Reader struct {
-	src *BufioReader
+	src *ElasticBufReader
 }
 
-func NewReader(src *BufioReader) *Reader {
+func NewReader(src *ElasticBufReader) *Reader {
 	return &Reader{
 		src: src,
 	}
@@ -43,6 +42,14 @@ func NewReader(src *BufioReader) *Reader {
 
 func (r *Reader) Reset(rd io.Reader) {
 	r.src.Reset(rd)
+}
+
+func (r *Reader) Buffer() []byte {
+	return r.src.Buffer()
+}
+
+func (r *Reader) ResetBuffer(buf []byte) {
+	r.src.ResetBuffer(buf)
 }
 
 func (r *Reader) Bytes() []byte {
@@ -54,12 +61,9 @@ func (r *Reader) ReadN(n int) ([]byte, error) {
 }
 
 func (r *Reader) ReadLine() ([]byte, error) {
-	line, isPrefix, err := r.src.ReadLine()
+	line, err := r.src.ReadLine()
 	if err != nil {
 		return nil, err
-	}
-	if isPrefix {
-		return nil, bufio.ErrBufferFull
 	}
 	if len(line) == 0 {
 		return nil, fmt.Errorf("redis: reply is empty")

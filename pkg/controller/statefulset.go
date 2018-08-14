@@ -72,7 +72,8 @@ func (c *Controller) checkStatefulSet(redis *api.Redis) error {
 		return err
 	}
 
-	if statefulSet.Labels[api.LabelDatabaseKind] != api.ResourceKindRedis {
+	if statefulSet.Labels[api.LabelDatabaseKind] != api.ResourceKindRedis ||
+		statefulSet.Labels[api.LabelDatabaseName] != redis.Name {
 		return fmt.Errorf(`Intended statefulSet "%v" already exists`, redis.OffshootName())
 	}
 
@@ -88,6 +89,11 @@ func (c *Controller) createStatefulSet(redis *api.Redis) (*apps.StatefulSet, kut
 	ref, rerr := reference.GetReference(clientsetscheme.Scheme, redis)
 	if rerr != nil {
 		return nil, kutil.VerbUnchanged, rerr
+	}
+
+	redisVersion, err := c.ExtClient.RedisVersions().Get(string(redis.Spec.Version), metav1.GetOptions{})
+	if err != nil {
+		return nil, kutil.VerbUnchanged, err
 	}
 
 	return app_util.CreateOrPatchStatefulSet(c.Client, statefulSetMeta, func(in *apps.StatefulSet) *apps.StatefulSet {
@@ -108,7 +114,7 @@ func (c *Controller) createStatefulSet(redis *api.Redis) (*apps.StatefulSet, kut
 		)
 		in.Spec.Template.Spec.Containers = core_util.UpsertContainer(in.Spec.Template.Spec.Containers, core.Container{
 			Name:            api.ResourceSingularRedis,
-			Image:           c.docker.GetImageWithTag(redis),
+			Image:           redisVersion.Spec.DB.Image,
 			ImagePullPolicy: core.PullIfNotPresent,
 			Ports: []core.ContainerPort{
 				{
@@ -127,7 +133,7 @@ func (c *Controller) createStatefulSet(redis *api.Redis) (*apps.StatefulSet, kut
 					fmt.Sprintf("--address=:%d", redis.Spec.Monitor.Prometheus.Port),
 					fmt.Sprintf("--enable-analytics=%v", c.EnableAnalytics),
 				}, c.LoggerOptions.ToFlags()...),
-				Image:           c.docker.GetOperatorImageWithTag(redis),
+				Image:           redisVersion.Spec.Exporter.Image,
 				ImagePullPolicy: core.PullIfNotPresent,
 				Ports: []core.ContainerPort{
 					{

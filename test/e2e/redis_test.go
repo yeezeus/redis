@@ -15,19 +15,27 @@ import (
 
 var _ = Describe("Redis", func() {
 	var (
-		err         error
-		f           *framework.Invocation
-		redis       *api.Redis
-		skipMessage string
+		err          error
+		f            *framework.Invocation
+		redis        *api.Redis
+		redisVersion *api.RedisVersion
+		skipMessage  string
+		dbName       string
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
 		redis = f.Redis()
+		redisVersion = f.RedisVersion()
 		skipMessage = ""
+		dbName = "kubedb"
 	})
 
 	var createAndWaitForRunning = func() {
+		By("Create RedisVersion: " + redisVersion.Name)
+		err = f.CreateRedisVersion(redisVersion)
+		Expect(err).NotTo(HaveOccurred())
+
 		By("Create Redis: " + redis.Name)
 		err = f.CreateRedis(redis)
 		Expect(err).NotTo(HaveOccurred())
@@ -57,6 +65,10 @@ var _ = Describe("Redis", func() {
 
 		By("Wait for redis resources to be wipedOut")
 		f.EventuallyWipedOut(redis.ObjectMeta).Should(Succeed())
+
+		By("Delete RedisVersion")
+		err = f.DeleteRedisVersion(redisVersion.ObjectMeta)
+		Expect(err).NotTo(HaveOccurred())
 	}
 
 	var shouldSuccessfullyRunning = func() {
@@ -237,7 +249,7 @@ var _ = Describe("Redis", func() {
 
 			Context("Allowed Envs", func() {
 				It("should run successfully with given Env", func() {
-					redis.Spec.Env = envList
+					redis.Spec.PodTemplate.Spec.Env = envList
 					createAndWaitForRunning()
 
 					By("Checking pod started with given envs")
@@ -255,12 +267,12 @@ var _ = Describe("Redis", func() {
 
 			Context("Update Envs", func() {
 				It("should reject to update Env", func() {
-					redis.Spec.Env = envList
+					redis.Spec.PodTemplate.Spec.Env = envList
 					createAndWaitForRunning()
 
 					By("Updating Envs")
 					_, _, err := util.PatchRedis(f.ExtClient(), redis, func(in *api.Redis) *api.Redis {
-						in.Spec.Env = []core.EnvVar{
+						in.Spec.PodTemplate.Spec.Env = []core.EnvVar{
 							{
 								Name:  "TEST_ENV",
 								Value: "patched",

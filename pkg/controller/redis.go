@@ -115,20 +115,6 @@ func (c *Controller) create(redis *api.Redis) error {
 		}
 	}
 
-	if err := c.manageMonitor(redis); err != nil {
-		if ref, rerr := reference.GetReference(clientsetscheme.Scheme, redis); rerr == nil {
-			c.recorder.Eventf(
-				ref,
-				core.EventTypeWarning,
-				eventer.EventReasonFailedToCreate,
-				"Failed to manage monitoring system. Reason: %v",
-				err,
-			)
-		}
-		log.Errorln(err)
-		return nil
-	}
-
 	rd, err := util.UpdateRedisStatus(c.ExtClient, redis, func(in *api.RedisStatus) *api.RedisStatus {
 		in.Phase = api.DatabasePhaseRunning
 		return in
@@ -145,6 +131,35 @@ func (c *Controller) create(redis *api.Redis) error {
 		return err
 	}
 	redis.Status = rd.Status
+
+	// ensure StatsService for desired monitoring
+	if _, err := c.ensureStatsService(redis); err != nil {
+		if ref, rerr := reference.GetReference(clientsetscheme.Scheme, redis); rerr == nil {
+			c.recorder.Eventf(
+				ref,
+				core.EventTypeWarning,
+				eventer.EventReasonFailedToCreate,
+				"Failed to manage monitoring system. Reason: %v",
+				err,
+			)
+		}
+		log.Errorln(err)
+		return nil
+	}
+
+	if err := c.manageMonitor(redis); err != nil {
+		if ref, rerr := reference.GetReference(clientsetscheme.Scheme, redis); rerr == nil {
+			c.recorder.Eventf(
+				ref,
+				core.EventTypeWarning,
+				eventer.EventReasonFailedToCreate,
+				"Failed to manage monitoring system. Reason: %v",
+				err,
+			)
+		}
+		log.Errorln(err)
+		return nil
+	}
 
 	return nil
 }
