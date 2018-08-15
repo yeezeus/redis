@@ -46,10 +46,8 @@ func (c *Controller) create(redis *api.Redis) error {
 		return err
 	}
 
-	if redis.Status.CreationTime == nil {
+	if redis.Status.Phase == "" {
 		rd, err := util.UpdateRedisStatus(c.ExtClient, redis, func(in *api.RedisStatus) *api.RedisStatus {
-			t := metav1.Now()
-			in.CreationTime = &t
 			in.Phase = api.DatabasePhaseCreating
 			return in
 		}, api.EnableStatusSubresource)
@@ -117,6 +115,7 @@ func (c *Controller) create(redis *api.Redis) error {
 
 	rd, err := util.UpdateRedisStatus(c.ExtClient, redis, func(in *api.RedisStatus) *api.RedisStatus {
 		in.Phase = api.DatabasePhaseRunning
+		in.ObservedGeneration = redis.Generation
 		return in
 	}, api.EnableStatusSubresource)
 	if err != nil {
