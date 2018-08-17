@@ -27,7 +27,7 @@ func (f *Invocation) Redis() *api.Redis {
 		},
 		Spec: api.RedisSpec{
 			Version: jsonTypes.StrYo(DBVersion),
-			Storage: core.PersistentVolumeClaimSpec{
+			Storage: &core.PersistentVolumeClaimSpec{
 				Resources: core.ResourceRequirements{
 					Requests: core.ResourceList{
 						core.ResourceStorage: resource.MustParse("1Gi"),
