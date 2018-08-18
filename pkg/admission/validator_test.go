@@ -226,9 +226,10 @@ func sampleRedis() api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version:    "4.0",
-			DoNotPause: true,
-			Replicas:   types.Int32P(1),
+			Version:     "4.0",
+			DoNotPause:  true,
+			Replicas:    types.Int32P(1),
+			StorageType: api.StorageTypeDurable,
 			Storage: &core.PersistentVolumeClaimSpec{
 				StorageClassName: types.StringP("standard"),
 				Resources: core.ResourceRequirements{

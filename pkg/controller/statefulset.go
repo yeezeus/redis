@@ -116,6 +116,7 @@ func (c *Controller) createStatefulSet(redis *api.Redis) (*apps.StatefulSet, kut
 			Name:            api.ResourceSingularRedis,
 			Image:           redisVersion.Spec.DB.Image,
 			ImagePullPolicy: core.PullIfNotPresent,
+			Args:            redis.Spec.PodTemplate.Spec.Args,
 			Ports: []core.ContainerPort{
 				{
 					Name:          "db",
