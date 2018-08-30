@@ -9,6 +9,7 @@ import (
 
 	"github.com/appscode/go/log"
 	shell "github.com/codeskyblue/go-sh"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/redis/pkg/cmds/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -60,8 +61,8 @@ func (f *Framework) RunOperatorAndServer(kubeconfigPath string, stopCh <-chan st
 	defer GinkgoRecover()
 
 	sh := shell.NewSession()
-	args := []interface{}{"--namespace", f.Namespace()}
-	SetupServer := filepath.Join("..", "..", "hack", "dev", "setup.sh")
+	args := []interface{}{"--minikube"}
+	SetupServer := filepath.Join("..", "..", "hack", "deploy", "setup.sh")
 
 	By("Creating API server and webhook stuffs")
 	cmd := sh.Command(SetupServer, args...)
@@ -71,6 +72,7 @@ func (f *Framework) RunOperatorAndServer(kubeconfigPath string, stopCh <-chan st
 	By("Starting Server and Operator")
 	serverOpt := server.NewRedisServerOptions(os.Stdout, os.Stderr)
 
+	api.EnableStatusSubresource = true
 	serverOpt.RecommendedOptions.CoreAPI.CoreAPIKubeconfigPath = kubeconfigPath
 	serverOpt.RecommendedOptions.SecureServing.BindPort = 8443
 	serverOpt.RecommendedOptions.SecureServing.BindAddress = net.ParseIP("127.0.0.1")

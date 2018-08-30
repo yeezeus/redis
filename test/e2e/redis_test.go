@@ -20,7 +20,6 @@ var _ = Describe("Redis", func() {
 		redis        *api.Redis
 		redisVersion *api.RedisVersion
 		skipMessage  string
-		dbName       string
 	)
 
 	BeforeEach(func() {
@@ -28,7 +27,6 @@ var _ = Describe("Redis", func() {
 		redis = f.Redis()
 		redisVersion = f.RedisVersion()
 		skipMessage = ""
-		dbName = "kubedb"
 	})
 
 	var createAndWaitForRunning = func() {
@@ -123,10 +121,6 @@ var _ = Describe("Redis", func() {
 		})
 
 		Context("Resume", func() {
-			var usedInitSpec bool
-			BeforeEach(func() {
-				usedInitSpec = false
-			})
 
 			Context("Super Fast User - Create-Delete-Create-Delete-Create ", func() {
 				It("should resume DormantDatabase successfully", func() {
