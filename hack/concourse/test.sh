@@ -22,10 +22,16 @@ pushd "$GOPATH"/src/github.com/kubedb/$REPO_NAME
 
 # build and push docker-image
 ./hack/builddeps.sh
+./hack/dev/update-docker.sh
 
-./hack/docker/$OPERATOR_NAME/make.sh build
-./hack/docker/$OPERATOR_NAME/make.sh push
+# clean the cluster in case previous operator exists
+./hack/deploy/setup.sh --uninstall --purge
 
 # run tests
-./hack/deploy/setup.sh --docker-registry=kubedbci
-./hack/make.py test e2e --v=1 --storageclass=$StorageClass --selfhosted-operator=true --ginkgo.flakeAttempts=2
+./hack/deploy/setup.sh --docker-registry=${DOCKER_REGISTRY}
+./hack/make.py test e2e \
+  --v=1 \
+  --storageclass=${StorageClass:-standard} \
+  --selfhosted-operator=true \
+  --docker-registry=${DOCKER_REGISTRY} \
+  --ginkgo.flakeAttempts=2
