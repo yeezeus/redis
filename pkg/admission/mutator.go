@@ -103,6 +103,10 @@ func setDefaultValues(client kubernetes.Interface, extClient cs.Interface, redis
 		redis.Spec.StorageType = api.StorageTypeDurable
 	}
 
+	if redis.Spec.TerminationPolicy == "" {
+		redis.Spec.TerminationPolicy = api.TerminationPolicyPause
+	}
+
 	if redis.Spec.Replicas == nil {
 		redis.Spec.Replicas = types.Int32P(1)
 	}

@@ -129,6 +129,10 @@ func ValidateRedis(client kubernetes.Interface, extClient kubedbv1alpha1.KubedbV
 		return fmt.Errorf(`'spec.storageType' is missing`)
 	}
 
+	if redis.Spec.TerminationPolicy == "" {
+		return fmt.Errorf(`'spec.terminationPolicy' is missing`)
+	}
+
 	if redis.Spec.Replicas == nil || *redis.Spec.Replicas != 1 {
 		return fmt.Errorf(`spec.replicas "%v" invalid. Value must be one`, redis.Spec.Replicas)
 	}

@@ -238,6 +238,7 @@ func sampleRedis() api.Redis {
 					},
 				},
 			},
+			TerminationPolicy: api.TerminationPolicyPause,
 		},
 	}
 }
