@@ -99,12 +99,13 @@ func (f *Framework) CleanRedis() {
 		if _, _, err := util.PatchRedis(f.extClient, &e, func(in *api.Redis) *api.Redis {
 			in.ObjectMeta.Finalizers = nil
 			in.Spec.DoNotPause = false
+			in.Spec.TerminationPolicy = api.TerminationPolicyWipeOut
 			return in
 		}); err != nil {
 			fmt.Printf("error Patching Redis. error: %v", err)
 		}
 	}
-	if err := f.extClient.Redises(f.namespace).DeleteCollection(deleteInBackground(), metav1.ListOptions{}); err != nil {
+	if err := f.extClient.Redises(f.namespace).DeleteCollection(deleteInForeground(), metav1.ListOptions{}); err != nil {
 		fmt.Printf("error in deletion of Redis. Error: %v", err)
 	}
 }

@@ -2,11 +2,10 @@ package framework
 
 import (
 	"fmt"
-	"net"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/appscode/kutil/tools/portforward"
 	"github.com/go-redis/redis"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
@@ -18,37 +17,25 @@ func (f *Framework) GetDatabasePod(meta metav1.ObjectMeta) (*core.Pod, error) {
 }
 
 func (f *Framework) GetRedisClient(meta metav1.ObjectMeta) (*redis.Client, error) {
-	clusterIP := net.IP{192, 168, 99, 100} //minikube ip
-
 	pod, err := f.GetDatabasePod(meta)
 	if err != nil {
 		return nil, err
 	}
 
-	if pod.Spec.NodeName != "minikube" {
-		node, err := f.kubeClient.CoreV1().Nodes().Get(pod.Spec.NodeName, metav1.GetOptions{})
-		if err != nil {
-			return nil, err
-		}
+	f.tunnel = portforward.NewTunnel(
+		f.kubeClient.CoreV1().RESTClient(),
+		f.restConfig,
+		meta.Namespace,
+		pod.Name,
+		6379,
+	)
 
-		for _, addr := range node.Status.Addresses {
-			if addr.Type == core.NodeExternalIP {
-				clusterIP = net.ParseIP(addr.Address)
-				break
-			}
-		}
-	}
-
-	svc, err := f.kubeClient.CoreV1().Services(f.Namespace()).Get(meta.Name+"-test-svc", metav1.GetOptions{})
-	if err != nil {
+	if err := f.tunnel.ForwardPort(); err != nil {
 		return nil, err
 	}
 
-	nodePort := strconv.Itoa(int(svc.Spec.Ports[0].NodePort))
-	address := fmt.Sprintf(clusterIP.String() + ":" + nodePort)
-
 	return redis.NewClient(&redis.Options{
-		Addr:     address,
+		Addr:     fmt.Sprintf("localhost:%v", f.tunnel.Local),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	}), nil
@@ -62,6 +49,8 @@ func (f *Framework) EventuallyRedisConfig(meta metav1.ObjectMeta, config string)
 
 			client, err := f.GetRedisClient(meta)
 			Expect(err).NotTo(HaveOccurred())
+
+			defer f.tunnel.Close()
 
 			// ping database to check if it is ready
 			pong, err := client.Ping().Result()
@@ -81,6 +70,44 @@ func (f *Framework) EventuallyRedisConfig(meta metav1.ObjectMeta, config string)
 				ret = append(ret, r.(string))
 			}
 			return strings.Join(ret, " ")
+		},
+		time.Minute*5,
+		time.Second*5,
+	)
+}
+
+func (f *Framework) EventuallySetItem(meta metav1.ObjectMeta, key, value string) GomegaAsyncAssertion {
+	return Eventually(
+		func() bool {
+			client, err := f.GetRedisClient(meta)
+			Expect(err).NotTo(HaveOccurred())
+
+			defer f.tunnel.Close()
+
+			err = client.Set(key, value, 0).Err()
+			if err != nil {
+				return false
+			}
+			return true
+		},
+		time.Minute*5,
+		time.Second*5,
+	)
+}
+
+func (f *Framework) EventuallyGetItem(meta metav1.ObjectMeta, key string) GomegaAsyncAssertion {
+	return Eventually(
+		func() string {
+			client, err := f.GetRedisClient(meta)
+			Expect(err).NotTo(HaveOccurred())
+
+			defer f.tunnel.Close()
+
+			val, err := client.Get(key).Result()
+			if err != nil {
+				return ""
+			}
+			return string(val)
 		},
 		time.Minute*5,
 		time.Second*5,

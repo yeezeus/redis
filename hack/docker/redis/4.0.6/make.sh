@@ -3,9 +3,11 @@ set -xeou pipefail
 
 DOCKER_REGISTRY=${DOCKER_REGISTRY:-kubedb}
 IMG=redis
-TAG=4.0.6
+SUFFIX=v1
+DB_VERSION=4.0.6
+TAG="$DB_VERSION-$SUFFIX"
 
-docker pull $IMG:$TAG-alpine
+docker pull $IMG:$DB_VERSION-alpine
 
-docker tag $IMG:$TAG-alpine "$DOCKER_REGISTRY/$IMG:$TAG"
+docker tag $IMG:$DB_VERSION-alpine "$DOCKER_REGISTRY/$IMG:$TAG"
 docker push "$DOCKER_REGISTRY/$IMG:$TAG"
