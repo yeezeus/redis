@@ -5,7 +5,8 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	exec_util "github.com/appscode/kutil/tools/exec"
-	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	catalogapi "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	dbapi "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 	"github.com/kubedb/redis/test/e2e/framework"
 	"github.com/kubedb/redis/test/e2e/matcher"
@@ -19,8 +20,8 @@ var _ = Describe("Redis", func() {
 	var (
 		err          error
 		f            *framework.Invocation
-		redis        *api.Redis
-		redisVersion *api.RedisVersion
+		redis        *dbapi.Redis
+		redisVersion *catalogapi.RedisVersion
 		skipMessage  string
 		key          string
 		value        string
@@ -63,7 +64,7 @@ var _ = Describe("Redis", func() {
 		f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
 		By("WipeOut redis")
-		_, err := f.PatchDormantDatabase(redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
+		_, err := f.PatchDormantDatabase(redis.ObjectMeta, func(in *dbapi.DormantDatabase) *dbapi.DormantDatabase {
 			in.Spec.WipeOut = true
 			return in
 		})
@@ -157,7 +158,7 @@ var _ = Describe("Redis", func() {
 				f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
 
 				By("Update redis to set DoNotPause=false")
-				f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+				f.TryPatchRedis(redis.ObjectMeta, func(in *dbapi.Redis) *dbapi.Redis {
 					in.Spec.DoNotPause = false
 					return in
 				})
@@ -303,7 +304,7 @@ var _ = Describe("Redis", func() {
 
 			Context("with TerminationPolicyDelete", func() {
 				BeforeEach(func() {
-					redis.Spec.TerminationPolicy = api.TerminationPolicyDelete
+					redis.Spec.TerminationPolicy = dbapi.TerminationPolicyDelete
 				})
 
 				var shouldRunWithTerminationDelete = func() {
@@ -329,7 +330,7 @@ var _ = Describe("Redis", func() {
 
 			Context("with TerminationPolicyWipeOut", func() {
 				BeforeEach(func() {
-					redis.Spec.TerminationPolicy = api.TerminationPolicyWipeOut
+					redis.Spec.TerminationPolicy = dbapi.TerminationPolicyWipeOut
 				})
 
 				var shouldRunWithTerminationWipeOut = func() {
@@ -387,7 +388,7 @@ var _ = Describe("Redis", func() {
 					createAndWaitForRunning()
 
 					By("Updating Envs")
-					_, _, err := util.PatchRedis(f.ExtClient(), redis, func(in *api.Redis) *api.Redis {
+					_, _, err := util.PatchRedis(f.ExtClient().KubedbV1alpha1(), redis, func(in *dbapi.Redis) *dbapi.Redis {
 						in.Spec.PodTemplate.Spec.Env = []core.EnvVar{
 							{
 								Name:  "TEST_ENV",
