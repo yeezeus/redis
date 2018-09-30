@@ -6,8 +6,8 @@ import (
 
 	"github.com/appscode/go/types"
 	"github.com/appscode/kutil/meta"
-	catalogapi "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
-	dbapi "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	catalog "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
+	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	extFake "github.com/kubedb/apimachinery/client/clientset/versioned/fake"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	admission "k8s.io/api/admission/v1beta1"
@@ -29,9 +29,9 @@ func init() {
 }
 
 var requestKind = metaV1.GroupVersionKind{
-	Group:   dbapi.SchemeGroupVersion.Group,
-	Version: dbapi.SchemeGroupVersion.Version,
-	Kind:    dbapi.ResourceKindRedis,
+	Group:   api.SchemeGroupVersion.Group,
+	Version: api.SchemeGroupVersion.Version,
+	Kind:    api.ResourceKindRedis,
 }
 
 func TestRedisValidator_Admit(t *testing.T) {
@@ -41,7 +41,7 @@ func TestRedisValidator_Admit(t *testing.T) {
 
 			validator.initialized = true
 			validator.extClient = extFake.NewSimpleClientset(
-				&catalogapi.RedisVersion{
+				&catalog.RedisVersion{
 					ObjectMeta: metaV1.ObjectMeta{
 						Name: "4.0",
 					},
@@ -55,11 +55,11 @@ func TestRedisValidator_Admit(t *testing.T) {
 				},
 			)
 
-			objJS, err := meta.MarshalToJson(&c.object, dbapi.SchemeGroupVersion)
+			objJS, err := meta.MarshalToJson(&c.object, api.SchemeGroupVersion)
 			if err != nil {
 				panic(err)
 			}
-			oldObjJS, err := meta.MarshalToJson(&c.oldObject, dbapi.SchemeGroupVersion)
+			oldObjJS, err := meta.MarshalToJson(&c.oldObject, api.SchemeGroupVersion)
 			if err != nil {
 				panic(err)
 			}
@@ -107,8 +107,8 @@ var cases = []struct {
 	objectName string
 	namespace  string
 	operation  admission.Operation
-	object     dbapi.Redis
-	oldObject  dbapi.Redis
+	object     api.Redis
+	oldObject  api.Redis
 	heatUp     bool
 	result     bool
 }{
@@ -118,7 +118,7 @@ var cases = []struct {
 		"default",
 		admission.Create,
 		sampleRedis(),
-		dbapi.Redis{},
+		api.Redis{},
 		false,
 		true,
 	},
@@ -128,7 +128,7 @@ var cases = []struct {
 		"default",
 		admission.Create,
 		getAwkwardRedis(),
-		dbapi.Redis{},
+		api.Redis{},
 		false,
 		false,
 	},
@@ -188,7 +188,7 @@ var cases = []struct {
 		"default",
 		admission.Delete,
 		sampleRedis(),
-		dbapi.Redis{},
+		api.Redis{},
 		true,
 		false,
 	},
@@ -198,7 +198,7 @@ var cases = []struct {
 		"default",
 		admission.Delete,
 		editSpecDoNotPause(sampleRedis()),
-		dbapi.Redis{},
+		api.Redis{},
 		true,
 		true,
 	},
@@ -207,31 +207,31 @@ var cases = []struct {
 		"foo",
 		"default",
 		admission.Delete,
-		dbapi.Redis{},
-		dbapi.Redis{},
+		api.Redis{},
+		api.Redis{},
 		false,
 		true,
 	},
 }
 
-func sampleRedis() dbapi.Redis {
-	return dbapi.Redis{
+func sampleRedis() api.Redis {
+	return api.Redis{
 		TypeMeta: metaV1.TypeMeta{
-			Kind:       dbapi.ResourceKindRedis,
-			APIVersion: dbapi.SchemeGroupVersion.String(),
+			Kind:       api.ResourceKindRedis,
+			APIVersion: api.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metaV1.ObjectMeta{
 			Name:      "foo",
 			Namespace: "default",
 			Labels: map[string]string{
-				dbapi.LabelDatabaseKind: dbapi.ResourceKindRedis,
+				api.LabelDatabaseKind: api.ResourceKindRedis,
 			},
 		},
-		Spec: dbapi.RedisSpec{
+		Spec: api.RedisSpec{
 			Version:     "4.0",
 			DoNotPause:  true,
 			Replicas:    types.Int32P(1),
-			StorageType: dbapi.StorageTypeDurable,
+			StorageType: api.StorageTypeDurable,
 			Storage: &core.PersistentVolumeClaimSpec{
 				StorageClassName: types.StringP("standard"),
 				Resources: core.ResourceRequirements{
@@ -243,30 +243,30 @@ func sampleRedis() dbapi.Redis {
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},
-			TerminationPolicy: dbapi.TerminationPolicyPause,
+			TerminationPolicy: api.TerminationPolicyPause,
 		},
 	}
 }
 
-func getAwkwardRedis() dbapi.Redis {
+func getAwkwardRedis() api.Redis {
 	redis := sampleRedis()
 	redis.Spec.Version = "3.0"
 	return redis
 }
 
-func editSpecVersion(old dbapi.Redis) dbapi.Redis {
+func editSpecVersion(old api.Redis) api.Redis {
 	old.Spec.Version = "4.4"
 	return old
 }
 
-func editStatus(old dbapi.Redis) dbapi.Redis {
-	old.Status = dbapi.RedisStatus{
-		Phase: dbapi.DatabasePhaseCreating,
+func editStatus(old api.Redis) api.Redis {
+	old.Status = api.RedisStatus{
+		Phase: api.DatabasePhaseCreating,
 	}
 	return old
 }
 
-func editSpecMonitor(old dbapi.Redis) dbapi.Redis {
+func editSpecMonitor(old api.Redis) api.Redis {
 	old.Spec.Monitor = &mona.AgentSpec{
 		Agent: mona.AgentPrometheusBuiltin,
 		Prometheus: &mona.PrometheusSpec{
@@ -277,14 +277,14 @@ func editSpecMonitor(old dbapi.Redis) dbapi.Redis {
 }
 
 // should be failed because more fields required for COreOS Monitoring
-func editSpecInvalidMonitor(old dbapi.Redis) dbapi.Redis {
+func editSpecInvalidMonitor(old api.Redis) api.Redis {
 	old.Spec.Monitor = &mona.AgentSpec{
 		Agent: mona.AgentCoreOSPrometheus,
 	}
 	return old
 }
 
-func editSpecDoNotPause(old dbapi.Redis) dbapi.Redis {
+func editSpecDoNotPause(old api.Redis) api.Redis {
 	old.Spec.DoNotPause = false
 	return old
 }
