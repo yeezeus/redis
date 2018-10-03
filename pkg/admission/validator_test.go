@@ -172,17 +172,17 @@ var cases = []struct {
 		false,
 		false,
 	},
-	{"Edit Spec.DoNotPause",
+	{"Edit Spec.TerminationPolicy",
 		requestKind,
 		"foo",
 		"default",
 		admission.Update,
-		editSpecDoNotPause(sampleRedis()),
+		pauseDatabase(sampleRedis()),
 		sampleRedis(),
 		false,
 		true,
 	},
-	{"Delete Redis when Spec.DoNotPause=true",
+	{"Delete Redis when Spec.TerminationPolicy = DoNotTerminate",
 		requestKind,
 		"foo",
 		"default",
@@ -192,12 +192,12 @@ var cases = []struct {
 		true,
 		false,
 	},
-	{"Delete Redis when Spec.DoNotPause=false",
+	{"Delete Redis when Spec.TerminationPolicy = Pause",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		editSpecDoNotPause(sampleRedis()),
+		pauseDatabase(sampleRedis()),
 		api.Redis{},
 		true,
 		true,
@@ -283,7 +283,7 @@ func editSpecInvalidMonitor(old api.Redis) api.Redis {
 	return old
 }
 
-func editSpecDoNotPause(old api.Redis) api.Redis {
+func pauseDatabase(old api.Redis) api.Redis {
 	old.Spec.TerminationPolicy = api.TerminationPolicyPause
 	return old
 }

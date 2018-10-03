@@ -138,9 +138,9 @@ var _ = Describe("Redis", func() {
 			})
 		})
 
-		Context("DoNotPause", func() {
+		Context("DoNotTerminate", func() {
 			BeforeEach(func() {
-				redis.Spec.DoNotPause = true
+				redis.Spec.TerminationPolicy = api.TerminationPolicyDoNotTerminate
 			})
 
 			It("should work successfully", func() {
@@ -157,9 +157,9 @@ var _ = Describe("Redis", func() {
 				By("Check for Running redis")
 				f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
 
-				By("Update redis to set DoNotPause=false")
+				By("Update redis to set spec.terminationPolicy = Pause")
 				f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
-					in.Spec.DoNotPause = false
+					in.Spec.TerminationPolicy = api.TerminationPolicyPause
 					return in
 				})
 			})
