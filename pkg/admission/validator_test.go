@@ -229,7 +229,6 @@ func sampleRedis() api.Redis {
 		},
 		Spec: api.RedisSpec{
 			Version:     "4.0",
-			DoNotPause:  true,
 			Replicas:    types.Int32P(1),
 			StorageType: api.StorageTypeDurable,
 			Storage: &core.PersistentVolumeClaimSpec{
@@ -243,7 +242,7 @@ func sampleRedis() api.Redis {
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},
-			TerminationPolicy: api.TerminationPolicyPause,
+			TerminationPolicy: api.TerminationPolicyDoNotTerminate,
 		},
 	}
 }
@@ -285,6 +284,6 @@ func editSpecInvalidMonitor(old api.Redis) api.Redis {
 }
 
 func editSpecDoNotPause(old api.Redis) api.Redis {
-	old.Spec.DoNotPause = false
+	old.Spec.TerminationPolicy = api.TerminationPolicyPause
 	return old
 }
