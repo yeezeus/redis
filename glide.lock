@@ -1,5 +1,5 @@
 hash: c7cce8b01da7db32d52f1f2a7bb599f9ef642d8e3e41293e00d190cb86d027bd
-updated: 2018-10-02T17:00:57.666328081-07:00
+updated: 2018-10-02T17:14:40.754854078-07:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -352,6 +352,7 @@ imports:
   - client/listers/kubedb/v1alpha1
   - pkg/admission
   - pkg/admission/dormantdatabase
+  - pkg/admission/namespace
   - pkg/admission/snapshot
   - pkg/controller
   - pkg/controller/dormantdatabase
@@ -536,7 +537,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 5dae35f858443b7779382d80661dbbb2dce23176
+  version: f5c49d98d21cc639f7ba8c7e4b127e88ee2af7ed
   subpackages:
   - gensupport
   - googleapi
