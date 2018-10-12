@@ -131,6 +131,9 @@ func ValidateRedis(client kubernetes.Interface, extClient cs.Interface, redis *a
 	if redis.Spec.StorageType == "" {
 		return fmt.Errorf(`'spec.storageType' is missing`)
 	}
+	if redis.Spec.StorageType != api.StorageTypeDurable && redis.Spec.StorageType != api.StorageTypeEphemeral {
+		return fmt.Errorf(`'spec.storageType' %s is invalid`, redis.Spec.StorageType)
+	}
 	if err := amv.ValidateStorage(client, redis.Spec.StorageType, redis.Spec.Storage); err != nil {
 		return err
 	}
