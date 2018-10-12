@@ -106,7 +106,7 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 			}
 		}
 		// validate database specs
-		if err = ValidateRedis(a.client, a.extClient, obj.(*api.Redis)); err != nil {
+		if err = ValidateRedis(a.client, a.extClient, obj.(*api.Redis), false); err != nil {
 			return hookapi.StatusForbidden(err)
 		}
 	}
@@ -116,7 +116,7 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 
 // ValidateRedis checks if the object satisfies all the requirements.
 // It is not method of Interface, because it is referenced from controller package too.
-func ValidateRedis(client kubernetes.Interface, extClient cs.Interface, redis *api.Redis) error {
+func ValidateRedis(client kubernetes.Interface, extClient cs.Interface, redis *api.Redis, strictValidation bool) error {
 	if redis.Spec.Version == "" {
 		return errors.New(`'spec.version' is missing`)
 	}
@@ -135,12 +135,29 @@ func ValidateRedis(client kubernetes.Interface, extClient cs.Interface, redis *a
 		return err
 	}
 
+	if strictValidation {
+		// Check if redisVersion is deprecated.
+		// If deprecated, return error
+		redisVersion, err := extClient.CatalogV1alpha1().RedisVersions().Get(string(redis.Spec.Version), metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		if redisVersion.Spec.Deprecated {
+			return fmt.Errorf("redis %s/%s is using deprecated version %v. Skipped processing",
+				redis.Namespace, redis.Name, redisVersion.Name)
+		}
+	}
+
 	if redis.Spec.UpdateStrategy.Type == "" {
 		return fmt.Errorf(`'spec.updateStrategy.type' is missing`)
 	}
 
 	if redis.Spec.TerminationPolicy == "" {
 		return fmt.Errorf(`'spec.terminationPolicy' is missing`)
+	}
+
+	if redis.Spec.StorageType == api.StorageTypeEphemeral && redis.Spec.TerminationPolicy == api.TerminationPolicyPause {
+		return fmt.Errorf(`'spec.terminationPolicy: Pause' can not be used for 'Ephemeral' storage`)
 	}
 
 	if err := amv.ValidateEnvVar(redis.Spec.PodTemplate.Spec.Env, forbiddenEnvVars, api.ResourceKindRedis); err != nil {
