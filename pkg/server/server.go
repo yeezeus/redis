@@ -29,8 +29,7 @@ import (
 )
 
 const (
-	apiserviceName    = "v1alpha1.validators.kubedb.com"
-	validatingWebhook = "redis.validators.kubedb.com"
+	apiserviceName = "v1alpha1.validators.kubedb.com"
 )
 
 var (
@@ -189,7 +188,7 @@ func (c completedConfig) New() (*RedisServer, error) {
 		s.GenericAPIServer.AddPostStartHookOrDie("validating-webhook-xray",
 			func(context genericapiserver.PostStartHookContext) error {
 				go func() {
-					xray := reg_util.NewCreateValidatingWebhookXray(c.OperatorConfig.ClientConfig, apiserviceName, validatingWebhook, &api.Redis{
+					xray := reg_util.NewCreateValidatingWebhookXray(c.OperatorConfig.ClientConfig, apiserviceName, &api.Redis{
 						TypeMeta: metav1.TypeMeta{
 							APIVersion: api.SchemeGroupVersion.String(),
 							Kind:       api.ResourceKindRedis,
