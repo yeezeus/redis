@@ -35,15 +35,7 @@ func (c *Controller) create(redis *api.Redis) error {
 
 	// Delete Matching DormantDatabase if exists any
 	if err := c.deleteMatchingDormantDatabase(redis); err != nil {
-		c.recorder.Eventf(
-			redis,
-			core.EventTypeWarning,
-			eventer.EventReasonFailedToCreate,
-			`Failed to delete dormant Database : "%v". Reason: %v`,
-			redis.Name,
-			err,
-		)
-		return err
+		return fmt.Errorf(`failed to delete dormant Database : "%v". Reason: %v`, redis.Name, err)
 	}
 
 	if redis.Status.Phase == "" {
@@ -52,12 +44,6 @@ func (c *Controller) create(redis *api.Redis) error {
 			return in
 		}, apis.EnableStatusSubresource)
 		if err != nil {
-			c.recorder.Eventf(
-				redis,
-				core.EventTypeWarning,
-				eventer.EventReasonFailedToUpdate,
-				err.Error(),
-			)
 			return err
 		}
 		redis.Status = rd.Status
@@ -66,14 +52,6 @@ func (c *Controller) create(redis *api.Redis) error {
 	// create Governing Service
 	governingService := c.GoverningService
 	if err := c.CreateGoverningService(governingService, redis.Namespace); err != nil {
-		c.recorder.Eventf(
-			redis,
-			core.EventTypeWarning,
-			eventer.EventReasonFailedToCreate,
-			`Failed to create Service: "%v". Reason: %v`,
-			governingService,
-			err,
-		)
 		return err
 	}
 
@@ -130,7 +108,7 @@ func (c *Controller) create(redis *api.Redis) error {
 			"Failed to manage monitoring system. Reason: %v",
 			err,
 		)
-		log.Errorln(err)
+		log.Errorf("failed to manage monitoring system. Reason: %v", err)
 		return nil
 	}
 
@@ -142,7 +120,7 @@ func (c *Controller) create(redis *api.Redis) error {
 			"Failed to manage monitoring system. Reason: %v",
 			err,
 		)
-		log.Errorln(err)
+		log.Errorf("failed to manage monitoring system. Reason: %v", err)
 		return nil
 	}
 

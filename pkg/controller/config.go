@@ -8,7 +8,6 @@ import (
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	amc "github.com/kubedb/apimachinery/pkg/controller"
 	"github.com/kubedb/apimachinery/pkg/controller/dormantdatabase"
-	snapc "github.com/kubedb/apimachinery/pkg/controller/snapshot"
 	crd_cs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -36,7 +35,6 @@ type OperatorConfig struct {
 	DBClient         cs.Interface
 	DynamicClient    dynamic.Interface
 	PromClient       pcm.MonitoringV1Interface
-	CronController   snapc.CronControllerInterface
 }
 
 func NewOperatorConfig(clientConfig *rest.Config) *OperatorConfig {
