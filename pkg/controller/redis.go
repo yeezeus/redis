@@ -35,7 +35,7 @@ func (c *Controller) create(redis *api.Redis) error {
 
 	// Delete Matching DormantDatabase if exists any
 	if err := c.deleteMatchingDormantDatabase(redis); err != nil {
-		return fmt.Errorf(`failed to delete dormant Database : "%v". Reason: %v`, redis.Name, err)
+		return fmt.Errorf(`failed to delete dormant Database : "%v/%v". Reason: %v`, redis.Namespace, redis.Name, err)
 	}
 
 	if redis.Status.Phase == "" {
@@ -151,10 +151,10 @@ func (c *Controller) terminate(redis *api.Redis) error {
 					return err
 				}
 				if val, _ := meta_util.GetStringValue(ddb.Labels, api.LabelDatabaseKind); val != api.ResourceKindRedis {
-					return fmt.Errorf(`DormantDatabase "%v" of kind %v already exists`, redis.Name, val)
+					return fmt.Errorf(`DormantDatabase "%v/%v" of kind %v already exists`, redis.Namespace, redis.Name, val)
 				}
 			} else {
-				return fmt.Errorf(`failed to create DormantDatabase: "%v". Reason: %v`, redis.Name, err)
+				return fmt.Errorf(`failed to create DormantDatabase: "%v/%v". Reason: %v`, redis.Namespace, redis.Name, err)
 			}
 		}
 	} else {

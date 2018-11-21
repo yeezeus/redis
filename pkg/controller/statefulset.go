@@ -63,7 +63,7 @@ func (c *Controller) checkStatefulSet(redis *api.Redis) error {
 
 	if statefulSet.Labels[api.LabelDatabaseKind] != api.ResourceKindRedis ||
 		statefulSet.Labels[api.LabelDatabaseName] != redis.Name {
-		return fmt.Errorf(`intended statefulSet "%v" already exists`, redis.OffshootName())
+		return fmt.Errorf(`intended statefulSet "%v/%v" already exists`, redis.Namespace, redis.OffshootName())
 	}
 
 	return nil

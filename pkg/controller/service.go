@@ -51,7 +51,7 @@ func (c *Controller) checkService(redis *api.Redis, serviceName string) error {
 
 	if service.Labels[api.LabelDatabaseKind] != api.ResourceKindRedis ||
 		service.Labels[api.LabelDatabaseName] != redis.Name {
-		return fmt.Errorf(`intended service "%v" already exists`, serviceName)
+		return fmt.Errorf(`intended service "%v/%v" already exists`, redis.Namespace, serviceName)
 	}
 
 	return nil
