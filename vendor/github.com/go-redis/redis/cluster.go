@@ -533,10 +533,12 @@ func (c *clusterState) slotSlaveNode(slot int) (*clusterNode, error) {
 			n := rand.Intn(len(nodes)-1) + 1
 			slave = nodes[n]
 			if !slave.Loading() {
-				break
+				return slave, nil
 			}
 		}
-		return slave, nil
+
+		// All slaves are loading - use master.
+		return nodes[0], nil
 	}
 }
 
@@ -580,13 +582,6 @@ func (c *clusterState) slotNodes(slot int) []*clusterNode {
 	return nil
 }
 
-func (c *clusterState) IsConsistent() bool {
-	if c.nodes.opt.ClusterSlots != nil {
-		return true
-	}
-	return len(c.Masters) <= len(c.Slaves)
-}
-
 //------------------------------------------------------------------------------
 
 type clusterStateHolder struct {
@@ -610,9 +605,6 @@ func (c *clusterStateHolder) Reload() (*clusterState, error) {
 	state, err := c.reload()
 	if err != nil {
 		return nil, err
-	}
-	if !state.IsConsistent() {
-		time.AfterFunc(time.Second, c.LazyReload)
 	}
 	return state, nil
 }
@@ -638,16 +630,11 @@ func (c *clusterStateHolder) LazyReload() {
 	go func() {
 		defer atomic.StoreUint32(&c.reloading, 0)
 
-		for {
-			state, err := c.reload()
-			if err != nil {
-				return
-			}
-			time.Sleep(100 * time.Millisecond)
-			if state.IsConsistent() {
-				return
-			}
+		_, err := c.reload()
+		if err != nil {
+			return
 		}
+		time.Sleep(100 * time.Millisecond)
 	}()
 }
 
@@ -979,9 +966,10 @@ func (c *ClusterClient) defaultProcess(cmd Cmder) error {
 			break
 		}
 
-		// If slave is loading - read from master.
+		// If slave is loading - pick another node.
 		if c.opt.ReadOnly && internal.IsLoadingError(err) {
 			node.MarkAsLoading()
+			node = nil
 			continue
 		}
 

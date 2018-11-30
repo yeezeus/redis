@@ -16,6 +16,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned/typed/appcatalog/v1alpha1"
 )
 
 type ExtraOptions struct {
@@ -115,6 +116,9 @@ func (s *ExtraOptions) ApplyTo(cfg *controller.OperatorConfig) error {
 		return err
 	}
 	if cfg.DynamicClient, err = dynamic.NewForConfig(cfg.ClientConfig); err != nil {
+		return err
+	}
+	if cfg.AppCatalogClient, err = appcat_cs.NewForConfig(cfg.ClientConfig); err != nil {
 		return err
 	}
 	if cfg.PromClient, err = prom.NewForConfig(&s.PrometheusCrdKinds, s.PrometheusCrdGroup, cfg.ClientConfig); err != nil {

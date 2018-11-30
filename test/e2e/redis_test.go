@@ -47,6 +47,13 @@ var _ = Describe("Redis", func() {
 
 		By("Wait for Running redis")
 		f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
+
+		By("Wait for AppBinding to create")
+		f.EventuallyAppBinding(redis.ObjectMeta).Should(BeTrue())
+
+		By("Check valid AppBinding Specs")
+		err := f.CheckAppBindingSpec(redis.ObjectMeta)
+		Expect(err).NotTo(HaveOccurred())
 	}
 
 	var deleteTestResource = func() {
@@ -281,10 +288,11 @@ var _ = Describe("Redis", func() {
 					f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
 
 					By("Update redis to set spec.terminationPolicy = Pause")
-					f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+					_, err := f.TryPatchRedis(redis.ObjectMeta, func(in *api.Redis) *api.Redis {
 						in.Spec.TerminationPolicy = api.TerminationPolicyPause
 						return in
 					})
+					Expect(err).NotTo(HaveOccurred())
 				})
 			})
 
@@ -432,23 +440,16 @@ var _ = Describe("Redis", func() {
 			Context("from configMap", func() {
 				var (
 					userConfig *core.ConfigMap
-					testSvc    *core.Service
 				)
 
 				BeforeEach(func() {
 					userConfig = f.GetCustomConfig(customConfigs)
-					testSvc = f.GetTestService(redis.ObjectMeta)
-
-					By("Creating Service: " + testSvc.Name)
-					f.CreateService(testSvc)
 				})
 
 				AfterEach(func() {
 					By("Deleting configMap: " + userConfig.Name)
-					f.DeleteConfigMap(userConfig.ObjectMeta)
-
-					By("Deleting Service: " + testSvc.Name)
-					f.DeleteService(testSvc.ObjectMeta)
+					err := f.DeleteConfigMap(userConfig.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("should set configuration provided in configMap", func() {
