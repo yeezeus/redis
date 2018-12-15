@@ -72,7 +72,7 @@ func New(
 		},
 		Config:     opt,
 		promClient: promClient,
-		recorder:   eventer.NewEventRecorder(client, "Redis operator"),
+		recorder:   recorder,
 		selector: labels.SelectorFromSet(map[string]string{
 			api.LabelDatabaseKind: api.ResourceKindRedis,
 		}),
