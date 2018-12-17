@@ -1,5 +1,34 @@
 # Change Log
 
+## [0.2.0](https://github.com/kubedb/redis/tree/0.2.0) (2018-12-17)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.2.0-rc.2...0.2.0)
+
+**Merged pull requests:**
+
+- Reuse event recorder [\#106](https://github.com/kubedb/redis/pull/106) ([tamalsaha](https://github.com/tamalsaha))
+- Revendor dependencies [\#105](https://github.com/kubedb/redis/pull/105) ([tamalsaha](https://github.com/tamalsaha))
+
+## [0.2.0-rc.2](https://github.com/kubedb/redis/tree/0.2.0-rc.2) (2018-12-06)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.2.0-rc.1...0.2.0-rc.2)
+
+**Merged pull requests:**
+
+- Ignore mutation of fields to default values during update [\#103](https://github.com/kubedb/redis/pull/103) ([tamalsaha](https://github.com/tamalsaha))
+- Support configuration options for exporter sidecar [\#102](https://github.com/kubedb/redis/pull/102) ([tamalsaha](https://github.com/tamalsaha))
+- Use flags.DumpAll [\#101](https://github.com/kubedb/redis/pull/101) ([tamalsaha](https://github.com/tamalsaha))
+
+## [0.2.0-rc.1](https://github.com/kubedb/redis/tree/0.2.0-rc.1) (2018-12-02)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.2.0-rc.0...0.2.0-rc.1)
+
+**Merged pull requests:**
+
+- Apply cleanup [\#100](https://github.com/kubedb/redis/pull/100) ([tamalsaha](https://github.com/tamalsaha))
+- Set periodic analytics [\#99](https://github.com/kubedb/redis/pull/99) ([tamalsaha](https://github.com/tamalsaha))
+-  Tests for appbinding [\#98](https://github.com/kubedb/redis/pull/98) ([the-redback](https://github.com/the-redback))
+- Fix analytics [\#97](https://github.com/kubedb/redis/pull/97) ([the-redback](https://github.com/the-redback))
+- Fix operator startup in minikube [\#96](https://github.com/kubedb/redis/pull/96) ([the-redback](https://github.com/the-redback))
+- Add CRDS without observation when operator starts [\#95](https://github.com/kubedb/redis/pull/95) ([the-redback](https://github.com/the-redback))
+
 ## [0.2.0-rc.0](https://github.com/kubedb/redis/tree/0.2.0-rc.0) (2018-10-15)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.2.0-beta.1...0.2.0-rc.0)
 
