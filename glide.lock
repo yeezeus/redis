@@ -1,5 +1,5 @@
-hash: e79a37565f1c3668272055c72e414f2aa11eb65880cd533b0985045cafb23a1d
-updated: 2018-12-14T16:24:54.062989375-08:00
+hash: 732d313f60a813ff3a119d99f8af38055c4db59693d90007b54d63b95617faf3
+updated: 2018-12-16T18:58:11.998701948-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -251,7 +251,7 @@ imports:
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/go-redis/redis
-  version: 45a00fd91abb111b4dd9cced7769d584d621ce2d
+  version: 6ff343b69ff581039533f17b9c1fb2e6b7f54220
   subpackages:
   - internal
   - internal/consistenthash
@@ -285,7 +285,7 @@ imports:
 - name: github.com/google/btree
   version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/go-cmp
-  version: 2248b49eaa8e1c8c0963ee77b40841adbc19d4ca
+  version: 3af367b6b30c263d47e8895973edcca9a49cf029
   subpackages:
   - cmp
   - cmp/internal/diff
@@ -350,7 +350,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: f2efa1e550560074ff45fbeeb1e37104736a0db8
+  version: 6319e29148b40f1ac9a7ea312394754e83feba8e
   subpackages:
   - apis
   - apis/authorization
