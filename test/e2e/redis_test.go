@@ -409,7 +409,7 @@ var _ = Describe("Redis", func() {
 			})
 
 			Context("Update Envs", func() {
-				It("should reject to update Env", func() {
+				It("should not reject to update Env", func() {
 					redis.Spec.PodTemplate.Spec.Env = envList
 					createAndWaitForRunning()
 
@@ -424,7 +424,7 @@ var _ = Describe("Redis", func() {
 						return in
 					})
 
-					Expect(err).To(HaveOccurred())
+					Expect(err).NotTo(HaveOccurred())
 				})
 			})
 
