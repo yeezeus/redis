@@ -9,7 +9,6 @@ import (
 	"github.com/appscode/go/homedir"
 	"github.com/appscode/go/log"
 	logs "github.com/appscode/go/log/golog"
-	pcm "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/scheme"
 	"github.com/kubedb/redis/pkg/controller"
@@ -26,21 +25,25 @@ import (
 	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned/typed/appcatalog/v1alpha1"
 )
 
-var (
-	storageClass string
+// To Run E2E tests:
+//
+// 1. ./hack/make.py test e2e
+//
+// 2. ./hack/make.py test e2e --v=1  --docker-registry=kubedbci --db-catalog=5.0 --db-version=5.0 --selfhosted-operator=true
 
-	prometheusCrdGroup = pcm.Group
-	prometheusCrdKinds = pcm.DefaultCrdKinds
+var (
+	storageClass = "standard"
 )
 
 func init() {
 	scheme.AddToScheme(clientSetScheme.Scheme)
 
-	flag.StringVar(&storageClass, "storageclass", "standard", "Kubernetes StorageClass name")
-	flag.StringVar(&framework.DockerRegistry, "docker-registry", "kubedb", "User provided docker repository")
-	flag.StringVar(&framework.ExporterTag, "exporter-tag", "canary", "Tag of kubedb/operator used as exporter")
-	flag.StringVar(&framework.DBVersion, "rd-version", "4.0-v1", "Redis version")
-	flag.BoolVar(&framework.SelfHostedOperator, "selfhosted-operator", false, "Enable this for provided controller")
+	flag.StringVar(&storageClass, "storageclass", storageClass, "Kubernetes StorageClass name")
+	flag.StringVar(&framework.DockerRegistry, "docker-registry", framework.DockerRegistry, "User provided docker repository")
+	flag.StringVar(&framework.ExporterTag, "exporter-tag", framework.ExporterTag, "Tag of kubedb/operator used as exporter")
+	flag.StringVar(&framework.DBCatalogName, "db-catalog", framework.DBCatalogName, "Postgres version")
+	flag.StringVar(&framework.DBVersion, "db-version", framework.DBVersion, "Redis version")
+	flag.BoolVar(&framework.SelfHostedOperator, "selfhosted-operator", framework.SelfHostedOperator, "Enable this for provided controller")
 }
 
 const (

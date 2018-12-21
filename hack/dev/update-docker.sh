@@ -52,6 +52,8 @@ done
 dbversions=(
   4.0.6
   4.0
+  5.0.3
+  5.0
 )
 
 exporters=(

@@ -1,0 +1,16 @@
+#!/bin/bash
+set -xeou pipefail
+
+DOCKER_REGISTRY=${DOCKER_REGISTRY:-kubedb}
+IMG=redis
+PATCH="5.0.3"
+TAG="5.0"
+ALT_TAG="5"
+
+docker pull "$DOCKER_REGISTRY/$IMG:$PATCH"
+
+docker tag "$DOCKER_REGISTRY/$IMG:$PATCH" "$DOCKER_REGISTRY/$IMG:$TAG"
+docker push "$DOCKER_REGISTRY/$IMG:$TAG"
+
+docker tag "$DOCKER_REGISTRY/$IMG:$PATCH" "$DOCKER_REGISTRY/$IMG:$ALT_TAG"
+docker push "$DOCKER_REGISTRY/$IMG:$ALT_TAG"
