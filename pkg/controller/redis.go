@@ -62,6 +62,13 @@ func (c *Controller) create(redis *api.Redis) error {
 		}
 	}
 
+	if c.EnableRBAC {
+		// Ensure ClusterRoles for statefulsets
+		if err := c.ensureRBACStuff(redis); err != nil {
+			return err
+		}
+	}
+
 	// ensure database Service
 	vt1, err := c.ensureService(redis)
 	if err != nil {

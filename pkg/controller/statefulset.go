@@ -300,6 +300,10 @@ func (c *Controller) createStatefulSet(redis *api.Redis, statefulSetName string,
 		in.Spec.Template.Spec.Priority = redis.Spec.PodTemplate.Spec.Priority
 		in.Spec.Template.Spec.SecurityContext = redis.Spec.PodTemplate.Spec.SecurityContext
 
+		if c.EnableRBAC {
+			in.Spec.Template.Spec.ServiceAccountName = redis.OffshootName()
+		}
+
 		in.Spec.UpdateStrategy = redis.Spec.UpdateStrategy
 		in = upsertUserEnv(in, redis)
 		in = upsertCustomConfig(in, redis)
