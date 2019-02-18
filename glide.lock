@@ -1,5 +1,5 @@
-hash: 8ecf4f89c5b507a9209fdf5b69a41e194c30c50764049c8c0dcdeebebf0171b5
-updated: 2019-02-09T15:26:39.563030884-08:00
+hash: 7e873c439243440e9aad71ba5f2fed61e9a18e3400a8a4c4ccb423e1ca9ca93c
+updated: 2019-02-18T14:21:39.925680918-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -247,18 +247,17 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 1de3e0542de65ad8d75452a595886fdd0befb363
+  version: 5bae59e25b21498baea7f9d46e9c147ec106a42e
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/go-redis/redis
-  version: f3bba01df2026fc865f7782948845db9cf44cf23
+  version: 22be8a3eaf992c828cecb69dc07348313bf08d2e
   subpackages:
   - internal
   - internal/consistenthash
   - internal/hashtag
   - internal/pool
   - internal/proto
-  - internal/singleflight
   - internal/util
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
@@ -350,7 +349,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: eeb9deabd8e6713fe06eb09dd44bfc40f180a652
+  version: 99a2b8e0fe3e67c39f0c0f3cf2c2b2400e9c2a6a
   subpackages:
   - apis
   - apis/authorization

@@ -9,9 +9,8 @@ source "$REPO_ROOT/hack/libbuild/common/kubedb_image.sh"
 
 DOCKER_REGISTRY=${DOCKER_REGISTRY:-kubedb}
 IMG=redis
-SUFFIX=v2
-TAG="4.0.6-$SUFFIX"
-DIR=4.0.6
+TAG="4.0.11"
+DIR=4.0.11
 
 build() {
   pushd "$REPO_ROOT/hack/docker/redis/$DIR"

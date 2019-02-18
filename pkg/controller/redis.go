@@ -55,6 +55,13 @@ func (c *Controller) create(redis *api.Redis) error {
 		return err
 	}
 
+	// ensure ConfigMap for redis configuration file (i.e. redis.conf)
+	if redis.Spec.Mode == api.RedisModeCluster {
+		if err := c.ensureRedisConfig(redis); err != nil {
+			return err
+		}
+	}
+
 	// ensure database Service
 	vt1, err := c.ensureService(redis)
 	if err != nil {
@@ -62,7 +69,7 @@ func (c *Controller) create(redis *api.Redis) error {
 	}
 
 	// ensure database StatefulSet
-	vt2, err := c.ensureStatefulSet(redis)
+	vt2, err := c.ensureRedisNodes(redis)
 	if err != nil {
 		return err
 	}
