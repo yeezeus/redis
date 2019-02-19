@@ -1,5 +1,5 @@
-hash: 7e873c439243440e9aad71ba5f2fed61e9a18e3400a8a4c4ccb423e1ca9ca93c
-updated: 2019-02-18T14:21:39.925680918-08:00
+hash: e694e9d5a4ee47482317adefbbc0e7c4cf2e4bfe73e3c00d8c75cb0fd23b630b
+updated: 2019-02-18T22:56:55.255587387-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -247,7 +247,7 @@ imports:
 - name: github.com/go-openapi/jsonreference
   version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
 - name: github.com/go-openapi/spec
-  version: 5bae59e25b21498baea7f9d46e9c147ec106a42e
+  version: 1de3e0542de65ad8d75452a595886fdd0befb363
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
 - name: github.com/go-redis/redis
@@ -349,7 +349,7 @@ imports:
 - name: github.com/json-iterator/go
   version: 1624edc4454b8682399def8740d46db5e4362ba4
 - name: github.com/kubedb/apimachinery
-  version: 99a2b8e0fe3e67c39f0c0f3cf2c2b2400e9c2a6a
+  version: a307434ffe887287826f1197ca7221213905900b
   subpackages:
   - apis
   - apis/authorization
