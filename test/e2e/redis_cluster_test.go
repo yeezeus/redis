@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/appscode/go/types"
-	"github.com/appscode/kutil/tools/portforward"
 	rd "github.com/go-redis/redis"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/redis/test/e2e/framework"
 	"github.com/kubedb/redis/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"kmodules.xyz/client-go/tools/portforward"
 )
 
 var createAndWaitForRunning = func() {

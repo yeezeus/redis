@@ -8,7 +8,6 @@ import (
 
 	"github.com/appscode/go/homedir"
 	"github.com/appscode/go/log"
-	logs "github.com/appscode/go/log/golog"
 	catalog "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	cs "github.com/kubedb/apimachinery/client/clientset/versioned"
@@ -25,6 +24,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 	ka "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
+	"kmodules.xyz/client-go/logs"
 	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned/typed/appcatalog/v1alpha1"
 )
 

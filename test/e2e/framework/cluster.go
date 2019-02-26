@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/appscode/go/sets"
-	core_util "github.com/appscode/kutil/core/v1"
-	"github.com/appscode/kutil/tools/portforward"
 	rd "github.com/go-redis/redis"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/redis/test/e2e/util"
@@ -17,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	core_util "kmodules.xyz/client-go/core/v1"
+	"kmodules.xyz/client-go/tools/portforward"
 )
 
 func (f *Framework) RedisClusterOptions() *rd.ClusterOptions {
