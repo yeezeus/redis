@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.3.0](https://github.com/kubedb/redis/tree/0.3.0) (2019-02-19)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.2.0...0.3.0)
+
+**Merged pull requests:**
+
+- Revendor dependencies [\#114](https://github.com/kubedb/redis/pull/114) ([tamalsaha](https://github.com/tamalsaha))
+- Initial RBAC support: create and use K8s service account for Redis [\#112](https://github.com/kubedb/redis/pull/112) ([the-redback](https://github.com/the-redback))
+- Revendor dependencies [\#111](https://github.com/kubedb/redis/pull/111) ([the-redback](https://github.com/the-redback))
+- Add certificate health checker [\#110](https://github.com/kubedb/redis/pull/110) ([tamalsaha](https://github.com/tamalsaha))
+- Redis 5.0.3, 5.0 Support added [\#109](https://github.com/kubedb/redis/pull/109) ([the-redback](https://github.com/the-redback))
+- Update E2E test: Env update is not restricted anymore [\#108](https://github.com/kubedb/redis/pull/108) ([the-redback](https://github.com/the-redback))
+- Fix AppBinding [\#107](https://github.com/kubedb/redis/pull/107) ([tamalsaha](https://github.com/tamalsaha))
+- Redis cluster support [\#94](https://github.com/kubedb/redis/pull/94) ([shudipta](https://github.com/shudipta))
+
 ## [0.2.0](https://github.com/kubedb/redis/tree/0.2.0) (2018-12-17)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.2.0-rc.2...0.2.0)
 
