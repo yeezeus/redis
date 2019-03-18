@@ -27,7 +27,7 @@ func (f *Invocation) Redis() *api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version: jsonTypes.StrYo(DBVersion),
+			Version: jsonTypes.StrYo(DBCatalogName),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},

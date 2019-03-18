@@ -20,7 +20,7 @@ func (i *Invocation) RedisVersion() *api.RedisVersion {
 		Spec: api.RedisVersionSpec{
 			Version: DBVersion,
 			DB: api.RedisVersionDatabase{
-				Image: fmt.Sprintf("%s/redis:%s", DockerRegistry, DBVersion),
+				Image: fmt.Sprintf("%s/redis:%s", DockerRegistry, DBImageTag),
 			},
 			Exporter: api.RedisVersionExporter{
 				Image: fmt.Sprintf("%s/redis_exporter:%s", DockerRegistry, ExporterTag),

@@ -389,6 +389,7 @@ var _ = Describe("Redis Cluster", func() {
 			err = client.ForEachSlave(func(slave *rd.Client) error {
 				err = slave.ClusterFailover().Err()
 				Expect(err).NotTo(HaveOccurred())
+				time.Sleep(time.Second * 5)
 
 				Eventually(func() bool {
 					err := client.ReloadState()
@@ -397,6 +398,7 @@ var _ = Describe("Redis Cluster", func() {
 					}
 					return true
 				}, "30s").Should(BeTrue())
+
 				return nil
 			})
 			Expect(err).NotTo(HaveOccurred())
