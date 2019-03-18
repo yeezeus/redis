@@ -25,6 +25,9 @@ func (i *Invocation) RedisVersion() *api.RedisVersion {
 			Exporter: api.RedisVersionExporter{
 				Image: fmt.Sprintf("%s/redis_exporter:%s", DockerRegistry, ExporterTag),
 			},
+			PodSecurityPolicies: api.RedisVersionPodSecurityPolicy{
+				DatabasePolicyName: "redis-db",
+			},
 		},
 	}
 }
