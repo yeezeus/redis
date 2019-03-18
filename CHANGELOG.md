@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.4.0](https://github.com/kubedb/redis/tree/0.4.0) (2019-03-18)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.3.0...0.4.0)
+
+**Merged pull requests:**
+
+- DB psp in e2e test framework [\#121](https://github.com/kubedb/redis/pull/121) ([iamrz1](https://github.com/iamrz1))
+- Add clustering support for Redis v5 [\#120](https://github.com/kubedb/redis/pull/120) ([shudipta](https://github.com/shudipta))
+- Don't inherit app.kubernetes.io labels from CRD into offshoots [\#119](https://github.com/kubedb/redis/pull/119) ([tamalsaha](https://github.com/tamalsaha))
+- Add role label to stats service [\#118](https://github.com/kubedb/redis/pull/118) ([tamalsaha](https://github.com/tamalsaha))
+- Fix bugs for unknown nodes in nodes.conf [\#117](https://github.com/kubedb/redis/pull/117) ([shudipta](https://github.com/shudipta))
+- PSP support for Redis. [\#116](https://github.com/kubedb/redis/pull/116) ([iamrz1](https://github.com/iamrz1))
+- Update Kubernetes client libraries to 1.13.0 release [\#115](https://github.com/kubedb/redis/pull/115) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [0.3.0](https://github.com/kubedb/redis/tree/0.3.0) (2019-02-19)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.2.0...0.3.0)
 
