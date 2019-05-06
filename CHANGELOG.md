@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.5.0](https://github.com/kubedb/redis/tree/0.5.0) (2019-05-06)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.4.0...0.5.0)
+
+**Merged pull requests:**
+
+- Revendor dependencies [\#124](https://github.com/kubedb/redis/pull/124) ([tamalsaha](https://github.com/tamalsaha))
+- Fix PSP in Role for kubeDB operator upgrade [\#123](https://github.com/kubedb/redis/pull/123) ([iamrz1](https://github.com/iamrz1))
+- Modify mutator validator names [\#122](https://github.com/kubedb/redis/pull/122) ([iamrz1](https://github.com/iamrz1))
+
 ## [0.4.0](https://github.com/kubedb/redis/tree/0.4.0) (2019-03-18)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.3.0...0.4.0)
 
