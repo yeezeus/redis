@@ -147,6 +147,9 @@ func setDefaultsFromDormantDB(extClient cs.Interface, redis *api.Redis) error {
 	// Skip checking UpdateStrategy
 	ddbOriginSpec.UpdateStrategy = redis.Spec.UpdateStrategy
 
+	// Skip checking ServiceAccountName
+	ddbOriginSpec.PodTemplate.Spec.ServiceAccountName = redis.Spec.PodTemplate.Spec.ServiceAccountName
+
 	// Skip checking TerminationPolicy
 	ddbOriginSpec.TerminationPolicy = redis.Spec.TerminationPolicy
 

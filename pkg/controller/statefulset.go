@@ -305,7 +305,7 @@ func (c *Controller) createStatefulSet(redis *api.Redis, statefulSetName string,
 		in.Spec.Template.Spec.SecurityContext = redis.Spec.PodTemplate.Spec.SecurityContext
 
 		if c.EnableRBAC {
-			in.Spec.Template.Spec.ServiceAccountName = redis.OffshootName()
+			in.Spec.Template.Spec.ServiceAccountName = redis.Spec.PodTemplate.Spec.ServiceAccountName
 		}
 
 		in.Spec.UpdateStrategy = redis.Spec.UpdateStrategy

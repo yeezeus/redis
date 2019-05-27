@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/crypto/rand"
+	"github.com/appscode/go/log"
 	catalog "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
@@ -12,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	core "k8s.io/api/core/v1"
+	rbac "k8s.io/api/rbac/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	exec_util "kmodules.xyz/client-go/tools/exec"
 )
@@ -159,6 +161,74 @@ var _ = Describe("Redis", func() {
 					By("Retrieving item from database")
 					f.EventuallyGetItem(redis.ObjectMeta, key).Should(BeEquivalentTo(value))
 
+				})
+			})
+
+			Context("Custom Resources", func() {
+
+				Context("with custom SA Name", func() {
+					BeforeEach(func() {
+						redis.Spec.PodTemplate.Spec.ServiceAccountName = "my-custom-sa"
+						redis.Spec.TerminationPolicy = api.TerminationPolicyPause
+					})
+
+					It("should start and resume successfully", func() {
+						//shouldTakeSnapshot()
+						createAndWaitForRunning()
+						By("Check if Postgres " + redis.Name + " exists.")
+						_, err := f.GetRedis(redis.ObjectMeta)
+						if err != nil {
+							if kerr.IsNotFound(err) {
+								// Postgres was not created. Hence, rest of cleanup is not necessary.
+								return
+							}
+							Expect(err).NotTo(HaveOccurred())
+						}
+
+						By("Delete redis: " + redis.Name)
+						err = f.DeleteRedis(redis.ObjectMeta)
+						if err != nil {
+							if kerr.IsNotFound(err) {
+								// Postgres was not created. Hence, rest of cleanup is not necessary.
+								log.Infof("Skipping rest of cleanup. Reason: Postgres %s is not found.", redis.Name)
+								return
+							}
+							Expect(err).NotTo(HaveOccurred())
+						}
+
+						By("Wait for redis to be paused")
+						f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
+
+						By("Resume DB")
+						createAndWaitForRunning()
+					})
+				})
+
+				Context("with custom SA", func() {
+					var customSAForDB *core.ServiceAccount
+					var customRoleForDB *rbac.Role
+					var customRoleBindingForDB *rbac.RoleBinding
+					BeforeEach(func() {
+						customSAForDB = f.ServiceAccount()
+						redis.Spec.PodTemplate.Spec.ServiceAccountName = customSAForDB.Name
+						customRoleForDB = f.RoleForElasticsearch(redis.ObjectMeta)
+						customRoleBindingForDB = f.RoleBinding(customSAForDB.Name, customRoleForDB.Name)
+					})
+					It("should take snapshot successfully", func() {
+						By("Create Database SA")
+						err = f.CreateServiceAccount(customSAForDB)
+						Expect(err).NotTo(HaveOccurred())
+
+						By("Create Database Role")
+						err = f.CreateRole(customRoleForDB)
+						Expect(err).NotTo(HaveOccurred())
+
+						By("Create Database RoleBinding")
+						err = f.CreateRoleBinding(customRoleBindingForDB)
+						Expect(err).NotTo(HaveOccurred())
+
+						createAndWaitForRunning()
+					})
 				})
 			})
 		})

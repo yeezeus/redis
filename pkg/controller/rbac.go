@@ -13,7 +13,7 @@ import (
 	rbac_util "kmodules.xyz/client-go/rbac/v1beta1"
 )
 
-func (c *Controller) createServiceAccount(db *api.Redis) error {
+func (c *Controller) createServiceAccount(db *api.Redis, saName string) error {
 	ref, rerr := reference.GetReference(clientsetscheme.Scheme, db)
 	if rerr != nil {
 		return rerr
@@ -22,7 +22,7 @@ func (c *Controller) createServiceAccount(db *api.Redis) error {
 	_, _, err := core_util.CreateOrPatchServiceAccount(
 		c.Client,
 		metav1.ObjectMeta{
-			Name:      db.OffshootName(),
+			Name:      saName,
 			Namespace: db.Namespace,
 		},
 		func(in *core.ServiceAccount) *core.ServiceAccount {
@@ -66,7 +66,7 @@ func (c *Controller) ensureRole(db *api.Redis, name string, pspName string) erro
 	return err
 }
 
-func (c *Controller) createRoleBinding(db *api.Redis, name string) error {
+func (c *Controller) createRoleBinding(db *api.Redis, roleName string, saName string) error {
 	ref, rerr := reference.GetReference(clientsetscheme.Scheme, db)
 	if rerr != nil {
 		return rerr
@@ -75,7 +75,7 @@ func (c *Controller) createRoleBinding(db *api.Redis, name string) error {
 	_, _, err := rbac_util.CreateOrPatchRoleBinding(
 		c.Client,
 		metav1.ObjectMeta{
-			Name:      name,
+			Name:      roleName,
 			Namespace: db.Namespace,
 		},
 		func(in *rbac.RoleBinding) *rbac.RoleBinding {
@@ -84,12 +84,12 @@ func (c *Controller) createRoleBinding(db *api.Redis, name string) error {
 			in.RoleRef = rbac.RoleRef{
 				APIGroup: rbac.GroupName,
 				Kind:     "Role",
-				Name:     name,
+				Name:     roleName,
 			}
 			in.Subjects = []rbac.Subject{
 				{
 					Kind:      rbac.ServiceAccountKind,
-					Name:      name,
+					Name:      saName,
 					Namespace: db.Namespace,
 				},
 			}
@@ -110,25 +110,38 @@ func (c *Controller) getPolicyNames(db *api.Redis) (string, error) {
 }
 
 func (c *Controller) ensureRBACStuff(redis *api.Redis) error {
-	dbPolicyName, err := c.getPolicyNames(redis)
-	if err != nil {
-		return err
+	saName := redis.Spec.PodTemplate.Spec.ServiceAccountName
+	if saName == "" {
+		saName = redis.OffshootName()
+		redis.Spec.PodTemplate.Spec.ServiceAccountName = saName
 	}
 
-	// Create New ServiceAccount
-	if err := c.createServiceAccount(redis); err != nil {
-		if !kerr.IsAlreadyExists(err) {
-			return err
+	sa, err := c.Client.CoreV1().ServiceAccounts(redis.Namespace).Get(saName, metav1.GetOptions{})
+	if kerr.IsNotFound(err) {
+		// create service account, since it does not exist
+		if err = c.createServiceAccount(redis, saName); err != nil {
+			if !kerr.IsAlreadyExists(err) {
+				return err
+			}
 		}
+	} else if err != nil {
+		return err
+	} else if !core_util.IsOwnedBy(sa, redis) {
+		// user provided the service account, so do nothing.
+		return nil
 	}
 
 	// Create New Role
-	if err := c.ensureRole(redis, redis.OffshootName(), dbPolicyName); err != nil {
+	pspName, err := c.getPolicyNames(redis)
+	if err != nil {
+		return err
+	}
+	if err := c.ensureRole(redis, redis.OffshootName(), pspName); err != nil {
 		return err
 	}
 
 	// Create New RoleBinding
-	if err := c.createRoleBinding(redis, redis.OffshootName()); err != nil {
+	if err := c.createRoleBinding(redis, redis.OffshootName(), saName); err != nil {
 		return err
 	}
 
