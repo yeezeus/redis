@@ -40,6 +40,11 @@ func (c *Controller) ensureStatefulSet(redis *api.Redis, statefulSetName string,
 		return kutil.VerbUnchanged, err
 	}
 
+	//ensure PDB for statefulSet
+	if err := c.CreateStatefulSetPodDisruptionBudget(statefulSet); err != nil {
+		return kutil.VerbUnchanged, err
+	}
+
 	// Check StatefulSet Pod status
 	if vt != kutil.VerbUnchanged {
 		if err := c.checkStatefulSetPodStatus(statefulSet); err != nil {

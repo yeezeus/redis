@@ -5,6 +5,7 @@ import (
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/log"
+	"github.com/appscode/go/types"
 	catalog "github.com/kubedb/apimachinery/apis/catalog/v1alpha1"
 	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	"github.com/kubedb/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
@@ -161,6 +162,34 @@ var _ = Describe("Redis", func() {
 					By("Retrieving item from database")
 					f.EventuallyGetItem(redis.ObjectMeta, key).Should(BeEquivalentTo(value))
 
+				})
+			})
+
+			Context("PDB", func() {
+
+				It("should run eviction successfully", func() {
+					// Create Redis
+					By("Create DB")
+					createAndWaitForRunning()
+					//Evict Redis pod
+					By("Try to evict Pod")
+					err := f.EvictPodsFromStatefulSet(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("should run eviction with shard successfully", func() {
+					redis = f.RedisCluster()
+					redis.Spec.Cluster = &api.RedisClusterSpec{
+						Master:   types.Int32P(3),
+						Replicas: types.Int32P(2),
+					}
+					// Create Redis
+					By("Create DB")
+					createAndWaitForRunning()
+					//Evict a Redis pod from each sts and deploy
+					By("Try to evict Pod")
+					err := f.EvictPodsFromStatefulSet(redis.ObjectMeta)
+					Expect(err).NotTo(HaveOccurred())
 				})
 			})
 
