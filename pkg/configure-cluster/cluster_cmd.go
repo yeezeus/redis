@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
 type ResetType string

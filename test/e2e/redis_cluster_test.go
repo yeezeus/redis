@@ -7,12 +7,12 @@ import (
 
 	"github.com/appscode/go/types"
 	rd "github.com/go-redis/redis"
-	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
-	"github.com/kubedb/redis/test/e2e/framework"
-	"github.com/kubedb/redis/test/e2e/matcher"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"kmodules.xyz/client-go/tools/portforward"
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"kubedb.dev/redis/test/e2e/framework"
+	"kubedb.dev/redis/test/e2e/matcher"
 )
 
 var createAndWaitForRunning = func() {

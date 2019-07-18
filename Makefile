@@ -46,7 +46,8 @@ endif
 ### These variables should not need tweaking.
 ###
 
-SRC_DIRS := cmd pkg test # directories which hold app source (not vendored)
+SRC_PKGS := cmd pkg
+SRC_DIRS := $(SRC_PKGS) test # directories which hold app source (not vendored)
 
 DOCKER_PLATFORMS := linux/amd64 linux/arm linux/arm64
 BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
@@ -65,7 +66,7 @@ TAG              := $(VERSION)_$(OS)_$(ARCH)
 TAG_PROD         := $(TAG)
 TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
 
-GO_VERSION       ?= 1.12.6
+GO_VERSION       ?= 1.12.7
 BUILD_IMAGE      ?= appscode/golang-dev:$(GO_VERSION)-stretch
 
 OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
@@ -78,8 +79,8 @@ BUILD_DIRS  := bin/$(OS)_$(ARCH)     \
                .go/bin/$(OS)_$(ARCH) \
                .go/cache
 
-DOCKERFILE_PROD  = Dockerfile.in
-DOCKERFILE_DBG   = Dockerfile.dbg
+DOCKERFILE_PROD  = hack/docker/rd-operator/Dockerfile.in
+DOCKERFILE_DBG   = hack/docker/rd-operator/Dockerfile.dbg
 
 # If you want to build all binaries, see the 'all-build' rule.
 # If you want to build all containers, see the 'all-container' rule.

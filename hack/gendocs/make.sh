@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-pushd $GOPATH/src/github.com/kubedb/redis/hack/gendocs
+pushd $GOPATH/src/kubedb.dev/redis/hack/gendocs
 go run main.go
 popd

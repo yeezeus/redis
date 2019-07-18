@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/appscode/go/types"
-	api "github.com/kubedb/apimachinery/apis/kubedb/v1alpha1"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,6 +12,7 @@ import (
 	"k8s.io/client-go/rest"
 	core_util "kmodules.xyz/client-go/core/v1"
 	"kmodules.xyz/client-go/tools/portforward"
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
 func WaitUntilFailedNodeAvailable(kubeClient kubernetes.Interface, statefulSet *apps.StatefulSet) error {
