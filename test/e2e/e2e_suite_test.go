@@ -50,10 +50,7 @@ func init() {
 
 	flag.StringVar(&storageClass, "storageclass", storageClass, "Kubernetes StorageClass name")
 	flag.StringVar(&framework.DockerRegistry, "docker-registry", framework.DockerRegistry, "User provided docker repository")
-	flag.StringVar(&framework.ExporterTag, "exporter-tag", framework.ExporterTag, "Tag of kubedb/operator used as exporter")
 	flag.StringVar(&framework.DBCatalogName, "db-catalog", framework.DBCatalogName, "Postgres version")
-	flag.StringVar(&framework.DBVersion, "db-version", framework.DBVersion, "Redis version")
-	flag.StringVar(&framework.DBImageTag, "db-image-tag", framework.DBImageTag, "Tag of kubedb/redis image used as db image")
 	flag.BoolVar(&framework.SelfHostedOperator, "selfhosted-operator", framework.SelfHostedOperator, "Enable this for provided controller")
 	flag.BoolVar(&framework.Cluster, "cluster", framework.Cluster, "Enable cluster tests")
 }
@@ -119,7 +116,6 @@ var _ = BeforeSuite(func() {
 		cl = clusterVar{}
 		cl.f = root.Invoke()
 		cl.redis = cl.f.RedisCluster()
-		cl.redisVersion = cl.f.RedisVersion()
 		createAndWaitForRunning()
 	}
 })

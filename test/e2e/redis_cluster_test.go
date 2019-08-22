@@ -16,12 +16,8 @@ import (
 )
 
 var createAndWaitForRunning = func() {
-	By("Create RedisVersion: " + cl.redisVersion.Name)
-	err := cl.f.CreateRedisVersion(cl.redisVersion)
-	Expect(err).NotTo(HaveOccurred())
-
 	By("Create Redis: " + cl.redis.Name)
-	err = cl.f.CreateRedis(cl.redis)
+	err := cl.f.CreateRedis(cl.redis)
 	Expect(err).NotTo(HaveOccurred())
 
 	By("Wait for Running redis")
@@ -49,13 +45,14 @@ var deleteTestResource = func() {
 
 	By("Wait for redis resources to be wipedOut")
 	cl.f.EventuallyWipedOut(cl.redis.ObjectMeta).Should(Succeed())
-
-	By("Delete RedisVersion")
-	err = cl.f.DeleteRedisVersion(cl.redisVersion.ObjectMeta)
-	Expect(err).NotTo(HaveOccurred())
 }
 
 var _ = Describe("Redis Cluster", func() {
+	BeforeEach(func() {
+		if !framework.Cluster {
+			Skip("cluster test is disabled")
+		}
+	})
 	var (
 		err                  error
 		skipMessage          string
@@ -146,18 +143,16 @@ var _ = Describe("Redis Cluster", func() {
 				Skip(skipMessage)
 			}
 
-			res := client.Get("A").Val()
-			if failover {
-				Expect(res).To(Equal("VALUE"))
-			} else {
+			if !failover {
+				res := client.Get("A").Val()
 				Expect(res).To(Equal(""))
 				err = client.Set("A", "VALUE", 0).Err()
 				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(func() string {
-					return client.Get("A").Val()
-				}, 30*time.Second).Should(Equal("VALUE"))
 			}
+
+			Eventually(func() string {
+				return client.Get("A").Val()
+			}, 30*time.Second).Should(Equal("VALUE"))
 		})
 	}
 

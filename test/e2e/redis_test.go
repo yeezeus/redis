@@ -12,7 +12,6 @@ import (
 	rbac "k8s.io/api/rbac/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	exec_util "kmodules.xyz/client-go/tools/exec"
-	catalog "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 	"kubedb.dev/redis/test/e2e/framework"
@@ -21,29 +20,23 @@ import (
 
 var _ = Describe("Redis", func() {
 	var (
-		err          error
-		f            *framework.Invocation
-		redis        *api.Redis
-		redisVersion *catalog.RedisVersion
-		skipMessage  string
-		key          string
-		value        string
+		err         error
+		f           *framework.Invocation
+		redis       *api.Redis
+		skipMessage string
+		key         string
+		value       string
 	)
 
 	BeforeEach(func() {
 		f = root.Invoke()
 		redis = f.Redis()
-		redisVersion = f.RedisVersion()
 		skipMessage = ""
 		key = rand.WithUniqSuffix("kubed-e2e")
 		value = rand.GenerateTokenWithLength(10)
 	})
 
 	var createAndWaitForRunning = func() {
-		By("Create RedisVersion: " + redisVersion.Name)
-		err = f.CreateRedisVersion(redisVersion)
-		Expect(err).NotTo(HaveOccurred())
-
 		By("Create Redis: " + redis.Name)
 		err = f.CreateRedis(redis)
 		Expect(err).NotTo(HaveOccurred())
@@ -107,14 +100,7 @@ var _ = Describe("Redis", func() {
 	}
 
 	AfterEach(func() {
-
 		deleteTestResource()
-
-		By("Delete RedisVersion")
-		err = f.DeleteRedisVersion(redisVersion.ObjectMeta)
-		if err != nil && !kerr.IsNotFound(err) {
-			Expect(err).NotTo(HaveOccurred())
-		}
 	})
 
 	var shouldSuccessfullyRunning = func() {

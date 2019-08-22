@@ -97,7 +97,7 @@ func (f *Framework) EventuallyRedis(meta metav1.ObjectMeta) GomegaAsyncAssertion
 			}
 			return true
 		},
-		time.Minute*5,
+		time.Minute*12,
 		time.Second*5,
 	)
 }
