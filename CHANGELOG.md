@@ -1,5 +1,22 @@
 # Change Log
 
+## [v0.6.0-rc.0](https://github.com/kubedb/redis/tree/v0.6.0-rc.0) (2019-08-22)
+[Full Changelog](https://github.com/kubedb/redis/compare/0.5.0...v0.6.0-rc.0)
+
+**Merged pull requests:**
+
+- Improve test: Use installed redisversions [\#135](https://github.com/kubedb/redis/pull/135) ([the-redback](https://github.com/the-redback))
+- Update dependencies [\#134](https://github.com/kubedb/redis/pull/134) ([tamalsaha](https://github.com/tamalsaha))
+- Don't set annotation to AppBinding [\#133](https://github.com/kubedb/redis/pull/133) ([hossainemruz](https://github.com/hossainemruz))
+- Set database version in AppBinding [\#132](https://github.com/kubedb/redis/pull/132) ([hossainemruz](https://github.com/hossainemruz))
+- Change package path to kubedb.dev/redis [\#131](https://github.com/kubedb/redis/pull/131) ([tamalsaha](https://github.com/tamalsaha))
+- Add license header to Makefiles [\#130](https://github.com/kubedb/redis/pull/130) ([tamalsaha](https://github.com/tamalsaha))
+- Add install, uninstall and purge command in Makefile [\#129](https://github.com/kubedb/redis/pull/129) ([hossainemruz](https://github.com/hossainemruz))
+- Add Makefile [\#128](https://github.com/kubedb/redis/pull/128) ([tamalsaha](https://github.com/tamalsaha))
+- Pod Disruption Budget for Redis [\#127](https://github.com/kubedb/redis/pull/127) ([iamrz1](https://github.com/iamrz1))
+- Handling resource ownership [\#126](https://github.com/kubedb/redis/pull/126) ([iamrz1](https://github.com/iamrz1))
+- Update to k8s 1.14.0 client libraries using go.mod [\#125](https://github.com/kubedb/redis/pull/125) ([tamalsaha](https://github.com/tamalsaha))
+
 ## [0.5.0](https://github.com/kubedb/redis/tree/0.5.0) (2019-05-06)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.4.0...0.5.0)
 
