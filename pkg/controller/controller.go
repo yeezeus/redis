@@ -19,7 +19,7 @@ import (
 	meta_util "kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/tools/queue"
 	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
-	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned/typed/appcatalog/v1alpha1"
+	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned"
 	"kubedb.dev/apimachinery/apis"
 	catalog "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
@@ -56,7 +56,7 @@ func New(
 	apiExtKubeClient crd_cs.ApiextensionsV1beta1Interface,
 	extClient cs.Interface,
 	dynamicClient dynamic.Interface,
-	appCatalogClient appcat_cs.AppcatalogV1alpha1Interface,
+	appCatalogClient appcat_cs.Interface,
 	promClient pcm.MonitoringV1Interface,
 	opt amc.Config,
 	recorder record.EventRecorder,

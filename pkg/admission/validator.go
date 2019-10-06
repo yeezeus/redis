@@ -163,6 +163,11 @@ func ValidateRedis(client kubernetes.Interface, extClient cs.Interface, redis *a
 			return fmt.Errorf("redis %s/%s is using deprecated version %v. Skipped processing",
 				redis.Namespace, redis.Name, redisVersion.Name)
 		}
+
+		if err := redisVersion.ValidateSpecs(); err != nil {
+			return fmt.Errorf("redis %s/%s is using invalid redisVersion %v. Skipped processing. reason: %v", redis.Namespace,
+				redis.Name, redisVersion.Name, err)
+		}
 	}
 
 	if redis.Spec.UpdateStrategy.Type == "" {

@@ -30,7 +30,7 @@ func (c *Controller) ensureAppBinding(db *api.Redis) (kutil.VerbType, error) {
 	if err != nil {
 		return kutil.VerbUnchanged, err
 	}
-	_, vt, err := appcat_util.CreateOrPatchAppBinding(c.AppCatalogClient, meta, func(in *appcat.AppBinding) *appcat.AppBinding {
+	_, vt, err := appcat_util.CreateOrPatchAppBinding(c.AppCatalogClient.AppcatalogV1alpha1(), meta, func(in *appcat.AppBinding) *appcat.AppBinding {
 		core_util.EnsureOwnerReference(&in.ObjectMeta, ref)
 		in.Labels = db.OffshootLabels()
 
