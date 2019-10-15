@@ -418,8 +418,8 @@ func upsertCustomConfig(statefulSet *apps.StatefulSet, redis *api.Redis) *apps.S
 				// send custom config file path as argument
 				configPath := filepath.Join(CONFIG_MOUNT_PATH, RedisConfigRelativePath)
 				args := statefulSet.Spec.Template.Spec.Containers[i].Args
-				if len(args) == 0 || args[len(args)-1] != configPath {
-					args = append(args, configPath)
+				if len(args) == 0 || args[0] != configPath {
+					args = append([]string{configPath}, args...)
 				}
 				statefulSet.Spec.Template.Spec.Containers[i].Args = args
 				break
