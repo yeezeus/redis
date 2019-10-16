@@ -53,6 +53,7 @@ var _ = Describe("Redis Cluster", func() {
 			Skip("cluster test is disabled")
 		}
 	})
+
 	var (
 		err                  error
 		skipMessage          string

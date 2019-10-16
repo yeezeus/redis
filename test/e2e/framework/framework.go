@@ -15,7 +15,7 @@ var (
 	DockerRegistry     = "kubedbci"
 	SelfHostedOperator = true
 	DBCatalogName      = "4.0-v2"
-	Cluster            = false
+	Cluster            = true
 )
 
 type Framework struct {

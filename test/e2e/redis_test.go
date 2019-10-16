@@ -2,6 +2,7 @@ package e2e_test
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/log"
@@ -172,6 +173,11 @@ var _ = Describe("Redis", func() {
 					// Create Redis
 					By("Create DB")
 					createAndWaitForRunning()
+
+					// Wait for some more time until the 2nd thread of operator completes
+					By(fmt.Sprintf("Wait for operator to complete processing the key %s/%s", redis.Namespace, redis.Name))
+					time.Sleep(time.Minute * 3)
+
 					//Evict a Redis pod from each sts and deploy
 					By("Try to evict Pod")
 					err := f.EvictPodsFromStatefulSet(redis.ObjectMeta)
@@ -259,13 +265,22 @@ var _ = Describe("Redis", func() {
 					err = f.DeleteRedis(redis.ObjectMeta)
 					Expect(err).NotTo(HaveOccurred())
 
-					By("Wait for redis to be paused")
+					By("Wait for Redis to be paused")
+					f.EventuallyRedis(redis.ObjectMeta).Should(BeFalse())
+
+					By("Wait for dormant created")
 					f.EventuallyDormantDatabaseStatus(redis.ObjectMeta).Should(matcher.HavePaused())
 
 					// Create Redis object again to resume it
 					By("Create Redis: " + redis.Name)
 					err = f.CreateRedis(redis)
 					Expect(err).NotTo(HaveOccurred())
+
+					By("Wait for Running redis")
+					f.EventuallyRedisRunning(redis.ObjectMeta).Should(BeTrue())
+
+					By("Wait for DormantDatabase to be deleted")
+					f.EventuallyDormantDatabase(redis.ObjectMeta).Should(BeFalse())
 
 					// Delete without caring if DB is resumed
 					By("Delete redis")
@@ -467,17 +482,19 @@ var _ = Describe("Redis", func() {
 		})
 
 		Context("Environment Variables", func() {
-
-			envList := []core.EnvVar{
-				{
-					Name:  "TEST_ENV",
-					Value: "kubedb-redis-e2e",
-				},
-			}
+			var envList []core.EnvVar
+			BeforeEach(func() {
+				envList = []core.EnvVar{
+					{
+						Name:  "TEST_ENV",
+						Value: "kubedb-redis-e2e",
+					},
+				}
+				redis.Spec.PodTemplate.Spec.Env = envList
+			})
 
 			Context("Allowed Envs", func() {
 				It("should run successfully with given Env", func() {
-					redis.Spec.PodTemplate.Spec.Env = envList
 					createAndWaitForRunning()
 
 					By("Checking pod started with given envs")
@@ -495,7 +512,6 @@ var _ = Describe("Redis", func() {
 
 			Context("Update Envs", func() {
 				It("should not reject to update Env", func() {
-					redis.Spec.PodTemplate.Spec.Env = envList
 					createAndWaitForRunning()
 
 					By("Updating Envs")

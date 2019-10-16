@@ -82,7 +82,7 @@ func (f *Framework) TryPatchRedis(meta metav1.ObjectMeta, transform func(*api.Re
 }
 
 func (f *Framework) DeleteRedis(meta metav1.ObjectMeta) error {
-	return f.extClient.KubedbV1alpha1().Redises(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
+	return f.extClient.KubedbV1alpha1().Redises(meta.Namespace).Delete(meta.Name, deleteInForeground())
 }
 
 func (f *Framework) EventuallyRedis(meta metav1.ObjectMeta) GomegaAsyncAssertion {
@@ -140,14 +140,17 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 		api.LabelDatabaseKind:       api.ResourceKindRedis,
 		api.LabelDatabaseName:       meta.GetName(),
 	}
+
 	// get sts in the namespace
 	stsList, err := f.kubeClient.AppsV1().StatefulSets(meta.Namespace).List(metav1.ListOptions{LabelSelector: labelSelector.String()})
 	if err != nil {
 		return err
 	}
+
 	if len(stsList.Items) < 1 {
 		return fmt.Errorf("found no statefulset in namespace %s with specific labels", meta.Namespace)
 	}
+
 	for _, sts := range stsList.Items {
 		// if PDB is not found, send error
 		var pdb *policy.PodDisruptionBudget
@@ -155,6 +158,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 		if err != nil {
 			return err
 		}
+
 		eviction := &policy.Eviction{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: policy.SchemeGroupVersion.String(),
