@@ -368,8 +368,9 @@ func upsertDataVolume(statefulSet *apps.StatefulSet, redis *api.Redis) *apps.Sta
 				}
 				statefulSet.Spec.VolumeClaimTemplates = core_util.UpsertVolumeClaim(statefulSet.Spec.VolumeClaimTemplates, claim)
 			}
+
+			break
 		}
-		break
 	}
 	return statefulSet
 }

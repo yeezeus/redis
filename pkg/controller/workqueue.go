@@ -35,7 +35,7 @@ func (c *Controller) runRedis(key string) error {
 					log.Errorln(err)
 					return err
 				}
-				redis, _, err = util.PatchRedis(c.ExtClient.KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
+				_, _, err = util.PatchRedis(c.ExtClient.KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
 					in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, api.GenericKey)
 					return in
 				})

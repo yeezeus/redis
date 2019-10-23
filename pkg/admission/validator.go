@@ -102,7 +102,7 @@ func (a *RedisValidator) Admit(req *admission.AdmissionRequest) *admission.Admis
 			redis := obj.(*api.Redis).DeepCopy()
 			oldRedis := oldObject.(*api.Redis).DeepCopy()
 			oldRedis.SetDefaults()
-			if err := validateUpdate(redis, oldRedis, req.Kind.Kind); err != nil {
+			if err := validateUpdate(redis, oldRedis); err != nil {
 				return hookapi.StatusBadRequest(fmt.Errorf("%v", err))
 			}
 		}
@@ -240,12 +240,12 @@ func matchWithDormantDatabase(extClient cs.Interface, redis *api.Redis) error {
 	return nil
 }
 
-func validateUpdate(obj, oldObj runtime.Object, kind string) error {
+func validateUpdate(obj, oldObj runtime.Object) error {
 	preconditions := getPreconditionFunc()
 	_, err := meta_util.CreateStrategicPatch(oldObj, obj, preconditions...)
 	if err != nil {
 		if mergepatch.IsPreconditionFailed(err) {
-			return fmt.Errorf("%v.%v", err, preconditionFailedError(kind))
+			return fmt.Errorf("%v.%v", err, preconditionFailedError())
 		}
 		return err
 	}
@@ -274,7 +274,7 @@ var preconditionSpecFields = []string{
 	"spec.podTemplate.spec.nodeSelector",
 }
 
-func preconditionFailedError(kind string) error {
+func preconditionFailedError() error {
 	str := preconditionSpecFields
 	strList := strings.Join(str, "\n\t")
 	return fmt.Errorf(strings.Join([]string{`At least one of the following was changed:

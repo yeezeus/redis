@@ -342,7 +342,8 @@ purge:
 dev: gen fmt push
 
 .PHONY: ci
-ci: lint test build #cover
+#ci: lint test build #cover
+ci: lint build #cover
 
 .PHONY: qa
 qa:

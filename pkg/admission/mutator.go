@@ -76,7 +76,7 @@ func (a *RedisMutator) Admit(req *admission.AdmissionRequest) *admission.Admissi
 	if err != nil {
 		return hookapi.StatusBadRequest(err)
 	}
-	mod, err := setDefaultValues(a.client, a.extClient, obj.(*api.Redis).DeepCopy())
+	mod, err := setDefaultValues(a.extClient, obj.(*api.Redis).DeepCopy())
 	if err != nil {
 		return hookapi.StatusForbidden(err)
 	} else if mod != nil {
@@ -94,7 +94,7 @@ func (a *RedisMutator) Admit(req *admission.AdmissionRequest) *admission.Admissi
 }
 
 // setDefaultValues provides the defaulting that is performed in mutating stage of creating/updating a Redis database
-func setDefaultValues(client kubernetes.Interface, extClient cs.Interface, redis *api.Redis) (runtime.Object, error) {
+func setDefaultValues(extClient cs.Interface, redis *api.Redis) (runtime.Object, error) {
 	if redis.Spec.Version == "" {
 		return nil, errors.New(`'spec.version' is missing`)
 	}

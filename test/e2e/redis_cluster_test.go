@@ -68,9 +68,8 @@ var _ = Describe("Redis Cluster", func() {
 		expectedClusterSlots []rd.ClusterSlot
 	)
 
-	var clusterSlots = func() ([]rd.ClusterSlot, error) {
+	var clusterSlots = func() ([]rd.ClusterSlot, error) { //nolint:unparam
 		var slots []rd.ClusterSlot
-
 		for i := range nodes {
 			for k := range nodes[i][0].SlotStart {
 				slot := rd.ClusterSlot{
@@ -375,11 +374,7 @@ var _ = Describe("Redis Cluster", func() {
 
 			err = client.ReloadState()
 			Eventually(func() bool {
-				err = client.ReloadState()
-				if err != nil {
-					return false
-				}
-				return true
+				return client.ReloadState() == nil
 			}, "30s").Should(BeTrue())
 
 			err = client.ForEachSlave(func(slave *rd.Client) error {
@@ -388,11 +383,7 @@ var _ = Describe("Redis Cluster", func() {
 				time.Sleep(time.Second * 5)
 
 				Eventually(func() bool {
-					err := client.ReloadState()
-					if err != nil {
-						return false
-					}
-					return true
+					return client.ReloadState() == nil
 				}, "30s").Should(BeTrue())
 
 				return nil

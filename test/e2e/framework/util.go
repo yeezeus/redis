@@ -4,30 +4,19 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
-	"time"
 
 	core "k8s.io/api/core/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
-	updateRetryInterval = 10 * 1000 * 1000 * time.Nanosecond
-	maxAttempts         = 5
-)
-
-func deleteInBackground() *metav1.DeleteOptions {
-	policy := metav1.DeletePropagationBackground
-	return &metav1.DeleteOptions{PropagationPolicy: &policy}
-}
-
 func deleteInForeground() *metav1.DeleteOptions {
 	policy := metav1.DeletePropagationForeground
 	return &metav1.DeleteOptions{PropagationPolicy: &policy}
 }
 
-func (fi *Invocation) GetPod(meta metav1.ObjectMeta) (*core.Pod, error) {
-	podList, err := fi.kubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{})
+func (f *Invocation) GetPod(meta metav1.ObjectMeta) (*core.Pod, error) {
+	podList, err := f.kubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
