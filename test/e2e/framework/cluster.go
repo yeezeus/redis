@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"kubedb.dev/redis/test/e2e/util"
+
 	"github.com/appscode/go/sets"
 	rd "github.com/go-redis/redis"
 	. "github.com/onsi/gomega"
@@ -15,8 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	core_util "kmodules.xyz/client-go/core/v1"
 	"kmodules.xyz/client-go/tools/portforward"
-	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	"kubedb.dev/redis/test/e2e/util"
 )
 
 func (f *Framework) RedisClusterOptions() *rd.ClusterOptions {

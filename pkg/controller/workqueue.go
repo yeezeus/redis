@@ -1,11 +1,12 @@
 package controller
 
 import (
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
+
 	"github.com/appscode/go/log"
 	core_util "kmodules.xyz/client-go/core/v1"
 	"kmodules.xyz/client-go/tools/queue"
-	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 )
 
 func (c *Controller) initWatcher() {
@@ -35,7 +36,7 @@ func (c *Controller) runRedis(key string) error {
 					log.Errorln(err)
 					return err
 				}
-				redis, _, err = util.PatchRedis(c.ExtClient.KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
+				_, _, err = util.PatchRedis(c.ExtClient.KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
 					in.ObjectMeta = core_util.RemoveFinalizer(in.ObjectMeta, api.GenericKey)
 					return in
 				})

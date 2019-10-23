@@ -21,20 +21,20 @@ const (
 	ServiceAccount      = "ServiceAccount"
 )
 
-func (i *Invocation) ServiceAccount() *core.ServiceAccount {
+func (fi *Invocation) ServiceAccount() *core.ServiceAccount {
 	return &core.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(i.app + "-rd"),
-			Namespace: i.namespace,
+			Name:      rand.WithUniqSuffix(fi.app + "-rd"),
+			Namespace: fi.namespace,
 		},
 	}
 }
 
-func (i *Invocation) RoleForElasticsearch(meta metav1.ObjectMeta) *rbac.Role {
+func (fi *Invocation) RoleForElasticsearch(meta metav1.ObjectMeta) *rbac.Role {
 	return &rbac.Role{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(i.app + "-rd"),
-			Namespace: i.namespace,
+			Name:      rand.WithUniqSuffix(fi.app + "-rd"),
+			Namespace: fi.namespace,
 		},
 		Rules: []rbac.PolicyRule{
 			{
@@ -55,11 +55,11 @@ func (i *Invocation) RoleForElasticsearch(meta metav1.ObjectMeta) *rbac.Role {
 	}
 }
 
-func (i *Invocation) RoleForSnapshot(meta metav1.ObjectMeta) *rbac.Role {
+func (fi *Invocation) RoleForSnapshot(meta metav1.ObjectMeta) *rbac.Role {
 	return &rbac.Role{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(i.app + "-rd"),
-			Namespace: i.namespace,
+			Name:      rand.WithUniqSuffix(fi.app + "-rd"),
+			Namespace: fi.namespace,
 		},
 		Rules: []rbac.PolicyRule{
 			{
@@ -80,11 +80,11 @@ func (i *Invocation) RoleForSnapshot(meta metav1.ObjectMeta) *rbac.Role {
 	}
 }
 
-func (i *Invocation) RoleBinding(saName string, roleName string) *rbac.RoleBinding {
+func (fi *Invocation) RoleBinding(saName string, roleName string) *rbac.RoleBinding {
 	return &rbac.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rand.WithUniqSuffix(i.app + "-rd"),
-			Namespace: i.namespace,
+			Name:      rand.WithUniqSuffix(fi.app + "-rd"),
+			Namespace: fi.namespace,
 		},
 		RoleRef: rbac.RoleRef{
 			APIGroup: rbacApiGroup,
@@ -94,7 +94,7 @@ func (i *Invocation) RoleBinding(saName string, roleName string) *rbac.RoleBindi
 		Subjects: []rbac.Subject{
 			{
 				Kind:      ServiceAccount,
-				Namespace: i.namespace,
+				Namespace: fi.namespace,
 				Name:      saName,
 			},
 		},

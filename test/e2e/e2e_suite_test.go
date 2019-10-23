@@ -7,11 +7,16 @@ import (
 	"testing"
 	"time"
 
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	cs "kubedb.dev/apimachinery/client/clientset/versioned"
+	"kubedb.dev/apimachinery/client/clientset/versioned/scheme"
+	"kubedb.dev/redis/test/e2e/framework"
+
 	"github.com/appscode/go/log"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
-	"k8s.io/apimachinery/pkg/labels"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/client-go/kubernetes"
 	clientSetScheme "k8s.io/client-go/kubernetes/scheme"
@@ -21,12 +26,6 @@ import (
 	"kmodules.xyz/client-go/logs"
 	"kmodules.xyz/client-go/tools/clientcmd"
 	appcat_cs "kmodules.xyz/custom-resources/client/clientset/versioned/typed/appcatalog/v1alpha1"
-	catalog "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
-	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	cs "kubedb.dev/apimachinery/client/clientset/versioned"
-	"kubedb.dev/apimachinery/client/clientset/versioned/scheme"
-	"kubedb.dev/redis/pkg/controller"
-	"kubedb.dev/redis/test/e2e/framework"
 )
 
 // To Run E2E tests:
@@ -35,11 +34,8 @@ import (
 //
 // 2. ./hack/make.py test e2e --v=1  --docker-registry=kubedbci --db-catalog=5.0 --db-version=5.0 --selfhosted-operator=true
 type clusterVar struct {
-	f                   *framework.Invocation
-	redis               *api.Redis
-	redisVersion        *catalog.RedisVersion
-	redisInstanceNumber int
-	selector            labels.Set
+	f     *framework.Invocation
+	redis *api.Redis
 }
 
 var (
@@ -55,7 +51,7 @@ var (
 )
 
 func init() {
-	scheme.AddToScheme(clientSetScheme.Scheme)
+	utilruntime.Must(scheme.AddToScheme(clientSetScheme.Scheme))
 
 	flag.StringVar(&kubeconfigPath, "kubeconfig", kubeconfigPath, "Path to kubeconfig file with authorization information (the master location is set by the master flag).")
 	flag.StringVar(&kubeContext, "kube-context", "", "Name of kube context")
@@ -71,7 +67,6 @@ const (
 )
 
 var (
-	ctrl *controller.Controller
 	root *framework.Framework
 	cl   clusterVar
 )

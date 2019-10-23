@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
+	"kubedb.dev/redis/test/e2e/framework"
+	"kubedb.dev/redis/test/e2e/matcher"
+
 	"github.com/appscode/go/crypto/rand"
 	"github.com/appscode/go/log"
 	"github.com/appscode/go/types"
@@ -13,10 +18,6 @@ import (
 	rbac "k8s.io/api/rbac/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	exec_util "kmodules.xyz/client-go/tools/exec"
-	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
-	"kubedb.dev/redis/test/e2e/framework"
-	"kubedb.dev/redis/test/e2e/matcher"
 )
 
 var _ = Describe("Redis", func() {

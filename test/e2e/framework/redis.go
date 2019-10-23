@@ -5,6 +5,9 @@ import (
 	"strconv"
 	"time"
 
+	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
+
 	"github.com/appscode/go/crypto/rand"
 	jsonTypes "github.com/appscode/go/encoding/json/types"
 	"github.com/appscode/go/types"
@@ -17,21 +20,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	meta_util "kmodules.xyz/client-go/meta"
-	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 )
 
 const (
 	kindEviction = "Eviction"
 )
 
-func (f *Invocation) Redis() *api.Redis {
+func (fi *Invocation) Redis() *api.Redis {
 	return &api.Redis{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      rand.WithUniqSuffix("redis"),
-			Namespace: f.namespace,
+			Namespace: fi.namespace,
 			Labels: map[string]string{
-				"app": f.app,
+				"app": fi.app,
 			},
 		},
 		Spec: api.RedisSpec{
@@ -46,14 +47,14 @@ func (f *Invocation) Redis() *api.Redis {
 						core.ResourceStorage: resource.MustParse("1Gi"),
 					},
 				},
-				StorageClassName: types.StringP(f.StorageClass),
+				StorageClassName: types.StringP(fi.StorageClass),
 			},
 		},
 	}
 }
 
-func (f *Invocation) RedisCluster() *api.Redis {
-	redis := f.Redis()
+func (fi *Invocation) RedisCluster() *api.Redis {
+	redis := fi.Redis()
 	redis.Spec.Mode = api.RedisModeCluster
 	redis.Spec.Cluster = &api.RedisClusterSpec{
 		Master:   types.Int32P(3),
