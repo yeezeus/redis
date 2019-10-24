@@ -1,3 +1,0 @@
-To deploy rd-operator:
-
-    $ ./hack/deploy/setup.sh --docker-registry=<docker-registry-name>

@@ -24,7 +24,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err = doc.GenMarkdownTree(rootCmd, dir); err != nil {
+	err = doc.GenMarkdownTree(rootCmd, dir)
+	if err != nil {
 		log.Fatal(err)
 	}
 }
