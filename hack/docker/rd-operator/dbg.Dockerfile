@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Copyright The KubeDB Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+FROM {ARG_FROM}
 
-CLUSTER_CONFIG="/data/nodes.conf"
-if [ -f ${CLUSTER_CONFIG} ]; then
-    if [ -z "${POD_IP}" ]; then
-        echo "Unable to determine Pod IP address!"
-        exit 1
-    fi
-    echo "Updating my IP to ${POD_IP} in ${CLUSTER_CONFIG}"
-    sed -i.bak -e "/myself/ s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${POD_IP}/" ${CLUSTER_CONFIG}
-fi
+ADD bin/{ARG_OS}_{ARG_ARCH}/{ARG_BIN} /{ARG_BIN}
 
-exec "$@"
+ENTRYPOINT ["/{ARG_BIN}"]
