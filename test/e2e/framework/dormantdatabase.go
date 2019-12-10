@@ -57,7 +57,7 @@ func (f *Framework) EventuallyDormantDatabase(meta metav1.ObjectMeta) GomegaAsyn
 			}
 			return true
 		},
-		time.Minute*5,
+		time.Minute*13,
 		time.Second*5,
 	)
 }

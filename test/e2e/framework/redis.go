@@ -125,7 +125,7 @@ func (f *Framework) EventuallyRedisRunning(meta metav1.ObjectMeta) GomegaAsyncAs
 			Expect(err).NotTo(HaveOccurred())
 			return redis.Status.Phase == api.DatabasePhaseRunning
 		},
-		time.Minute*5,
+		time.Minute*13,
 		time.Second*5,
 	)
 }
