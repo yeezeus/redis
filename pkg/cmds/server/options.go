@@ -36,7 +36,6 @@ import (
 )
 
 type ExtraOptions struct {
-	EnableRBAC                  bool
 	OperatorNamespace           string
 	RestrictToOperatorNamespace bool
 	GoverningService            string
@@ -59,7 +58,6 @@ func (s ExtraOptions) WatchNamespace() string {
 
 func NewExtraOptions() *ExtraOptions {
 	return &ExtraOptions{
-		EnableRBAC:        true,
 		OperatorNamespace: meta.Namespace(),
 		GoverningService:  "kubedb",
 		ResyncPeriod:      10 * time.Minute,
