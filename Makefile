@@ -357,8 +357,10 @@ install:
 		--set catalog.memcached=false \
 		--set catalog.mongo=false \
 		--set catalog.mysql=false \
+		--set catalog.perconaxtradb=false \
 		--set catalog.postgres=false \
-		--set catalog.redis=true
+		--set catalog.redis=true \
+		--set catalog.proxysql=false
 
 .PHONY: uninstall
 uninstall:
