@@ -24,7 +24,6 @@ import (
 	"kubedb.dev/apimachinery/client/clientset/versioned/typed/kubedb/v1alpha1/util"
 
 	"github.com/appscode/go/crypto/rand"
-	jsonTypes "github.com/appscode/go/encoding/json/types"
 	"github.com/appscode/go/types"
 	. "github.com/onsi/gomega"
 	apps "k8s.io/api/apps/v1"
@@ -51,7 +50,7 @@ func (fi *Invocation) Redis() *api.Redis {
 			},
 		},
 		Spec: api.RedisSpec{
-			Version: jsonTypes.StrYo(DBCatalogName),
+			Version: DBCatalogName,
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},
