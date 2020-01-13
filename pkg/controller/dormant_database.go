@@ -105,11 +105,10 @@ func (c *Controller) createDormantDatabase(redis *api.Redis) (*api.DormantDataba
 		Spec: api.DormantDatabaseSpec{
 			Origin: api.Origin{
 				PartialObjectMeta: ofst.PartialObjectMeta{
-					Name:              redis.Name,
-					Namespace:         redis.Namespace,
-					Labels:            redis.Labels,
-					Annotations:       redis.Annotations,
-					CreationTimestamp: redis.CreationTimestamp,
+					Name:        redis.Name,
+					Namespace:   redis.Namespace,
+					Labels:      redis.Labels,
+					Annotations: redis.Annotations,
 				},
 				Spec: api.OriginSpec{
 					Redis: &redis.Spec,
