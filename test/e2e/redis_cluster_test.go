@@ -22,12 +22,12 @@ import (
 
 	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"kubedb.dev/redis/test/e2e/framework"
-	"kubedb.dev/redis/test/e2e/matcher"
 
 	"github.com/appscode/go/types"
 	rd "github.com/go-redis/redis"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	kerr "k8s.io/apimachinery/pkg/api/errors"
 	"kmodules.xyz/client-go/tools/portforward"
 )
 
@@ -41,23 +41,35 @@ var createAndWaitForRunning = func() {
 }
 
 var deleteTestResource = func() {
-	By("Delete redis")
-	err := cl.f.DeleteRedis(cl.redis.ObjectMeta)
-	Expect(err).NotTo(HaveOccurred())
+	By("Check if Redis " + cl.redis.Name + " exists.")
+	rd, err := cl.f.GetRedis(cl.redis.ObjectMeta)
+	if err != nil {
+		if kerr.IsNotFound(err) {
+			// Redis was not created. Hence, rest of cleanup is not necessary.
+			return
+		}
+		Expect(err).NotTo(HaveOccurred())
+	}
 
-	By("Wait for redis to be paused")
-	cl.f.EventuallyDormantDatabaseStatus(cl.redis.ObjectMeta).Should(matcher.HavePaused())
-
-	By("WipeOut redis")
-	_, err = cl.f.PatchDormantDatabase(cl.redis.ObjectMeta, func(in *api.DormantDatabase) *api.DormantDatabase {
-		in.Spec.WipeOut = true
+	By("Update redis to set spec.terminationPolicy = WipeOut")
+	_, err = cl.f.PatchRedis(rd.ObjectMeta, func(in *api.Redis) *api.Redis {
+		in.Spec.TerminationPolicy = api.TerminationPolicyWipeOut
 		return in
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	By("Delete Dormant Database")
-	err = cl.f.DeleteDormantDatabase(cl.redis.ObjectMeta)
-	Expect(err).NotTo(HaveOccurred())
+	By("Delete redis")
+	err = cl.f.DeleteRedis(cl.redis.ObjectMeta)
+	if err != nil {
+		if kerr.IsNotFound(err) {
+			// Redis was not created. Hence, rest of cleanup is not necessary.
+			return
+		}
+		Expect(err).NotTo(HaveOccurred())
+	}
+
+	By("Wait for redis to be deleted")
+	cl.f.EventuallyRedis(cl.redis.ObjectMeta).Should(BeFalse())
 
 	By("Wait for redis resources to be wipedOut")
 	cl.f.EventuallyWipedOut(cl.redis.ObjectMeta).Should(Succeed())
@@ -425,7 +437,7 @@ var _ = Describe("Redis Cluster", func() {
 			}
 
 			By("Add replica")
-			cl.redis, err = cl.f.TryPatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+			cl.redis, err = cl.f.PatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
 				in.Spec.Cluster.Replicas = types.Int32P((*cl.redis.Spec.Cluster.Replicas) + 1)
 				return in
 			})
@@ -466,7 +478,7 @@ var _ = Describe("Redis Cluster", func() {
 			// =======================================
 
 			By("Remove replica")
-			cl.redis, err = cl.f.TryPatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+			cl.redis, err = cl.f.PatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
 				in.Spec.Cluster.Replicas = types.Int32P((*cl.redis.Spec.Cluster.Replicas) - 1)
 				return in
 			})
@@ -507,7 +519,7 @@ var _ = Describe("Redis Cluster", func() {
 			// =======================================
 
 			By("Add master")
-			cl.redis, err = cl.f.TryPatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+			cl.redis, err = cl.f.PatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
 				in.Spec.Cluster.Master = types.Int32P((*cl.redis.Spec.Cluster.Master) + 1)
 				return in
 			})
@@ -560,7 +572,7 @@ var _ = Describe("Redis Cluster", func() {
 			// =======================================
 
 			By("Remove master")
-			cl.redis, err = cl.f.TryPatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
+			cl.redis, err = cl.f.PatchRedis(cl.redis.ObjectMeta, func(in *api.Redis) *api.Redis {
 				in.Spec.Cluster.Master = types.Int32P((*cl.redis.Spec.Cluster.Master) - 1)
 				return in
 			})

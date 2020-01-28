@@ -99,7 +99,9 @@ func (f *Framework) EventuallySetItem(meta metav1.ObjectMeta, key, value string)
 
 			defer f.tunnel.Close()
 
-			return client.Set(key, value, 0).Err() == nil
+			cmd := client.Set(key, value, 0)
+			fmt.Printf("inserting kye:value=%v/%v. Full response: %v\n", key, value, cmd)
+			return cmd.Err() == nil
 		},
 		time.Minute*5,
 		time.Second*5,
@@ -114,8 +116,10 @@ func (f *Framework) EventuallyGetItem(meta metav1.ObjectMeta, key string) Gomega
 
 			defer f.tunnel.Close()
 
-			val, err := client.Get(key).Result()
+			cmd := client.Get(key)
+			val, err := cmd.Result()
 			if err != nil {
+				fmt.Printf("got error while looking for key-value %v:%v. Error: %v. Full response: %v\n", key, val, err, cmd)
 				return ""
 			}
 			return string(val)

@@ -28,16 +28,15 @@ import (
 )
 
 var (
-	DockerRegistry     = "kubedbci"
-	SelfHostedOperator = true
-	DBCatalogName      = "4.0-v2"
-	Cluster            = true
+	DockerRegistry = "kubedbci"
+	DBCatalogName  = "4.0-v2"
+	Cluster        = true
 )
 
 type Framework struct {
 	restConfig       *rest.Config
 	kubeClient       kubernetes.Interface
-	extClient        cs.Interface
+	dbClient         cs.Interface
 	kaClient         ka.Interface
 	appCatalogClient appcat_cs.AppcatalogV1alpha1Interface
 	tunnel           *portforward.Tunnel
@@ -57,7 +56,7 @@ func New(
 	return &Framework{
 		restConfig:       restConfig,
 		kubeClient:       kubeClient,
-		extClient:        extClient,
+		dbClient:         extClient,
 		kaClient:         kaClient,
 		appCatalogClient: appCatalogClient,
 		name:             "redis-operator",
@@ -74,7 +73,7 @@ func (f *Framework) Invoke() *Invocation {
 }
 
 func (fi *Invocation) ExtClient() cs.Interface {
-	return fi.extClient
+	return fi.dbClient
 }
 
 func (fi *Invocation) RestConfig() *rest.Config {

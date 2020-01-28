@@ -21,9 +21,7 @@ import (
 	"strings"
 
 	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
-	"kubedb.dev/apimachinery/pkg/admission/dormantdatabase"
 	"kubedb.dev/apimachinery/pkg/admission/namespace"
-	"kubedb.dev/apimachinery/pkg/admission/snapshot"
 	"kubedb.dev/apimachinery/pkg/eventer"
 	rdAdmsn "kubedb.dev/redis/pkg/admission"
 	"kubedb.dev/redis/pkg/controller"
@@ -135,8 +133,6 @@ func (c completedConfig) New() (*RedisServer, error) {
 	if c.OperatorConfig.EnableValidatingWebhook {
 		c.ExtraConfig.AdmissionHooks = append(c.ExtraConfig.AdmissionHooks,
 			&rdAdmsn.RedisValidator{},
-			&snapshot.SnapshotValidator{},
-			&dormantdatabase.DormantDatabaseValidator{},
 			&namespace.NamespaceValidator{
 				Resources: []string{api.ResourcePluralRedis},
 			})

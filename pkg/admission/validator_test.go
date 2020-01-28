@@ -204,7 +204,7 @@ var cases = []struct {
 		"foo",
 		"default",
 		admission.Update,
-		pauseDatabase(sampleRedis()),
+		haltDatabase(sampleRedis()),
 		sampleRedis(),
 		false,
 		true,
@@ -219,12 +219,12 @@ var cases = []struct {
 		true,
 		false,
 	},
-	{"Delete Redis when Spec.TerminationPolicy = Pause",
+	{"Delete Redis when Spec.TerminationPolicy = Halt",
 		requestKind,
 		"foo",
 		"default",
 		admission.Delete,
-		pauseDatabase(sampleRedis()),
+		haltDatabase(sampleRedis()),
 		api.Redis{},
 		true,
 		true,
@@ -358,7 +358,9 @@ func editSpecMonitor(old api.Redis) api.Redis {
 	old.Spec.Monitor = &mona.AgentSpec{
 		Agent: mona.AgentPrometheusBuiltin,
 		Prometheus: &mona.PrometheusSpec{
-			Port: 4567,
+			Exporter: &mona.PrometheusExporterSpec{
+				Port: 4567,
+			},
 		},
 	}
 	return old
@@ -367,13 +369,13 @@ func editSpecMonitor(old api.Redis) api.Redis {
 // should be failed because more fields required for COreOS Monitoring
 func editSpecInvalidMonitor(old api.Redis) api.Redis {
 	old.Spec.Monitor = &mona.AgentSpec{
-		Agent: mona.AgentCoreOSPrometheus,
+		Agent: mona.AgentPrometheusOperator,
 	}
 	return old
 }
 
-func pauseDatabase(old api.Redis) api.Redis {
-	old.Spec.TerminationPolicy = api.TerminationPolicyPause
+func haltDatabase(old api.Redis) api.Redis {
+	old.Spec.TerminationPolicy = api.TerminationPolicyHalt
 	return old
 }
 

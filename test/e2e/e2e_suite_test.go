@@ -32,7 +32,6 @@ import (
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/client-go/kubernetes"
 	clientSetScheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -73,7 +72,6 @@ func init() {
 	flag.StringVar(&storageClass, "storageclass", storageClass, "Kubernetes StorageClass name")
 	flag.StringVar(&framework.DockerRegistry, "docker-registry", framework.DockerRegistry, "User provided docker repository")
 	flag.StringVar(&framework.DBCatalogName, "db-catalog", framework.DBCatalogName, "Postgres version")
-	flag.BoolVar(&framework.SelfHostedOperator, "selfhosted-operator", framework.SelfHostedOperator, "Enable this for provided controller")
 	flag.BoolVar(&framework.Cluster, "cluster", framework.Cluster, "Enable cluster tests")
 }
 
@@ -120,13 +118,7 @@ var _ = BeforeSuite(func() {
 	err = root.CreateNamespace()
 	Expect(err).NotTo(HaveOccurred())
 
-	if !framework.SelfHostedOperator {
-		stopCh := genericapiserver.SetupSignalHandler()
-		go root.RunOperatorAndServer(config, kubeconfigPath, stopCh)
-	}
-
 	root.EventuallyCRD().Should(Succeed())
-	root.EventuallyAPIServiceReady().Should(Succeed())
 
 	if framework.Cluster {
 		cl = clusterVar{}
@@ -141,15 +133,8 @@ var _ = AfterSuite(func() {
 		deleteTestResource()
 	}
 
-	By("Cleanup Left Overs")
-	if !framework.SelfHostedOperator {
-		By("Delete Admission Controller Configs")
-		root.CleanAdmissionConfigs()
-	}
 	By("Delete left over Redis objects")
 	root.CleanRedis()
-	By("Delete left over Dormant Database objects")
-	root.CleanDormantDatabase()
 	By("Delete Namespace")
 	err := root.DeleteNamespace()
 	Expect(err).NotTo(HaveOccurred())
