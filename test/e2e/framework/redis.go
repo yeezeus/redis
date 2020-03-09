@@ -214,7 +214,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 		}
 
 		// try to evict one extra pod. TooManyRequests err should occur
-		eviction.Name = sts.Name + "-" + strconv.Itoa(maxUnavailable)
+		eviction.Name = sts.Name + "-" + strconv.Itoa(maxUnavailable-1)
 
 		err = f.kubeClient.PolicyV1beta1().Evictions(eviction.Namespace).Evict(eviction)
 		if kerr.IsTooManyRequests(err) {

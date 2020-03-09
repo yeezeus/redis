@@ -12,6 +12,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
+	gomodules.xyz/envsubst v0.1.0
 	k8s.io/api v0.0.0-20191122220107-b5267f2975e0
 	k8s.io/apiextensions-apiserver v0.0.0-20191114105449-027877536833
 	k8s.io/apimachinery v0.16.5-beta.1
@@ -23,7 +24,7 @@ require (
 	kmodules.xyz/monitoring-agent-api v0.0.0-20200125202117-d3b3e33ce41f
 	kmodules.xyz/offshoot-api v0.0.0-20200216080509-45ee6418d1c1
 	kmodules.xyz/webhook-runtime v0.0.0-20191127075323-d4bfdee6974d
-	kubedb.dev/apimachinery v0.13.0-rc.4
+	kubedb.dev/apimachinery v0.13.0-rc.4.0.20200309164204-e6f72c373e44
 )
 
 replace (
@@ -59,6 +60,7 @@ replace (
 	k8s.io/metrics => k8s.io/metrics v0.0.0-20191114105837-a4a2842dc51b
 	k8s.io/repo-infra => k8s.io/repo-infra v0.0.0-20181204233714-00fe14e3d1a3
 	k8s.io/utils => k8s.io/utils v0.0.0-20190801114015-581e00157fb1
+	kmodules.xyz/objectstore-api => kmodules.xyz/objectstore-api v0.0.0-20200214040336-fe8f39a4210d
 	sigs.k8s.io/kustomize => sigs.k8s.io/kustomize v2.0.3+incompatible
 	sigs.k8s.io/structured-merge-diff => sigs.k8s.io/structured-merge-diff v0.0.0-20190817042607-6149e4549fca
 	sigs.k8s.io/yaml => sigs.k8s.io/yaml v1.1.0

@@ -125,22 +125,26 @@ func (c completedConfig) New() (*RedisServer, error) {
 		return nil, err
 	}
 
+	ctrl, err := c.OperatorConfig.New()
+	if err != nil {
+		return nil, err
+	}
+
 	if c.OperatorConfig.EnableMutatingWebhook {
 		c.ExtraConfig.AdmissionHooks = []hooks.AdmissionHook{
-			&rdAdmsn.RedisMutator{},
+			&rdAdmsn.RedisMutator{
+				ClusterTopology: ctrl.ClusterTopology,
+			},
 		}
 	}
 	if c.OperatorConfig.EnableValidatingWebhook {
 		c.ExtraConfig.AdmissionHooks = append(c.ExtraConfig.AdmissionHooks,
-			&rdAdmsn.RedisValidator{},
+			&rdAdmsn.RedisValidator{
+				ClusterTopology: ctrl.ClusterTopology,
+			},
 			&namespace.NamespaceValidator{
 				Resources: []string{api.ResourcePluralRedis},
 			})
-	}
-
-	ctrl, err := c.OperatorConfig.New()
-	if err != nil {
-		return nil, err
 	}
 
 	s := &RedisServer{
