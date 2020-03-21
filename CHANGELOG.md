@@ -1,5 +1,32 @@
 # Change Log
 
+## [Unreleased](https://github.com/kubedb/redis/tree/HEAD)
+
+[Full Changelog](https://github.com/kubedb/redis/compare/v0.6.0-rc.0...HEAD)
+
+**Merged pull requests:**
+
+- Support PodAffinity Templating [\#155](https://github.com/kubedb/redis/pull/155) ([faem](https://github.com/faem))
+- Use stash.appscode.dev/apimachinery@v0.9.0-rc.6 [\#154](https://github.com/kubedb/redis/pull/154) ([tamalsaha](https://github.com/tamalsaha))
+- Version update to resolve security issue in github.com/apache/thrift [\#153](https://github.com/kubedb/redis/pull/153) ([MitaliBo](https://github.com/MitaliBo))
+- Use rancher/local-path-provisioner@v0.0.12 [\#152](https://github.com/kubedb/redis/pull/152) ([tamalsaha](https://github.com/tamalsaha))
+- Introduce spec.halted and removed dormant crd [\#151](https://github.com/kubedb/redis/pull/151) ([the-redback](https://github.com/the-redback))
+- Add `Pause` Feature [\#150](https://github.com/kubedb/redis/pull/150) ([faem](https://github.com/faem))
+- Refactor CI pipeline to build once [\#149](https://github.com/kubedb/redis/pull/149) ([tamalsaha](https://github.com/tamalsaha))
+- Update kubernetes client-go to 1.16.3 [\#148](https://github.com/kubedb/redis/pull/148) ([tamalsaha](https://github.com/tamalsaha))
+- Update catalog values for make install command [\#147](https://github.com/kubedb/redis/pull/147) ([tamalsaha](https://github.com/tamalsaha))
+- Use charts to install operator [\#146](https://github.com/kubedb/redis/pull/146) ([tamalsaha](https://github.com/tamalsaha))
+- Matrix test for github actions [\#145](https://github.com/kubedb/redis/pull/145) ([the-redback](https://github.com/the-redback))
+- Add license header to files [\#144](https://github.com/kubedb/redis/pull/144) ([tamalsaha](https://github.com/tamalsaha))
+- Use log.Fatal instead of Must\(\) [\#143](https://github.com/kubedb/redis/pull/143) ([shudipta](https://github.com/shudipta))
+- Run e2e tests in parallel [\#142](https://github.com/kubedb/redis/pull/142) ([tamalsaha](https://github.com/tamalsaha))
+- Enable make ci [\#141](https://github.com/kubedb/redis/pull/141) ([tamalsaha](https://github.com/tamalsaha))
+- Remove EnableStatusSubresource [\#140](https://github.com/kubedb/redis/pull/140) ([tamalsaha](https://github.com/tamalsaha))
+- Fix tests for github actions [\#139](https://github.com/kubedb/redis/pull/139) ([shudipta](https://github.com/shudipta))
+- Validate DBVersionSpecs and fixed broken build [\#138](https://github.com/kubedb/redis/pull/138) ([the-redback](https://github.com/the-redback))
+- Run e2e tests using GitHub actions [\#137](https://github.com/kubedb/redis/pull/137) ([tamalsaha](https://github.com/tamalsaha))
+- Prepend redis.conf to the arguments for redis-server cmd [\#136](https://github.com/kubedb/redis/pull/136) ([shudipta](https://github.com/shudipta))
+
 ## [v0.6.0-rc.0](https://github.com/kubedb/redis/tree/v0.6.0-rc.0) (2019-08-22)
 [Full Changelog](https://github.com/kubedb/redis/compare/0.5.0...v0.6.0-rc.0)
 
