@@ -67,7 +67,7 @@ TAG              := $(VERSION)_$(OS)_$(ARCH)
 TAG_PROD         := $(TAG)
 TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
 
-GO_VERSION       ?= 1.13.4
+GO_VERSION       ?= 1.14.2
 BUILD_IMAGE      ?= appscode/golang-dev:$(GO_VERSION)
 
 OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
@@ -335,7 +335,7 @@ REGISTRY_SECRET ?=
 ifeq ($(strip $(REGISTRY_SECRET)),)
 	IMAGE_PULL_SECRETS =
 else
-	IMAGE_PULL_SECRETS = --set imagePullSecrets[0]=$(REGISTRY_SECRET)
+	IMAGE_PULL_SECRETS = --set imagePullSecrets[0].name=$(REGISTRY_SECRET)
 endif
 
 .PHONY: install
@@ -343,13 +343,17 @@ install:
 	@cd ../installer; \
 	helm install kubedb charts/kubedb \
 		--namespace=kube-system \
-		--set kubedb.registry=$(REGISTRY) \
-		--set kubedb.repository=rd-operator \
-		--set kubedb.tag=$(TAG) \
+		--set operator.registry=$(REGISTRY) \
+		--set operator.repository=rd-operator \
+		--set operator.tag=$(TAG) \
+		--set enterprise.enabled=false \
+		--set enterprise.tag=b615b1ac_linux_amd64 \
 		--set imagePullPolicy=Always \
 		$(IMAGE_PULL_SECRETS); \
-	kubectl wait --for=condition=Ready pods -n kube-system -l app=kubedb --timeout=5m; \
-	kubectl wait --for=condition=Available apiservice -l app=kubedb --timeout=5m; \
+	kubectl wait --for=condition=Ready pods -n kube-system -l 'app.kubernetes.io/name=kubedb,app.kubernetes.io/instance=kubedb' --timeout=5m; \
+	kubectl wait --for=condition=Available apiservice -l 'app.kubernetes.io/name=kubedb,app.kubernetes.io/instance=kubedb' --timeout=5m; \
+	until kubectl get crds redisversions.catalog.kubedb.com -o=jsonpath='{.items[0].metadata.name}' &> /dev/null; do sleep 1; done; \
+	kubectl wait --for=condition=Established crds -l app=kubedb --timeout=5m; \
 	helm install kubedb-catalog charts/kubedb-catalog \
 		--namespace=kube-system \
 		--set catalog.elasticsearch=false \
