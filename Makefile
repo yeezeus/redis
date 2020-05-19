@@ -352,7 +352,7 @@ install:
 		$(IMAGE_PULL_SECRETS); \
 	kubectl wait --for=condition=Available apiservice -l 'app.kubernetes.io/name=kubedb,app.kubernetes.io/instance=kubedb' --timeout=5m; \
 	until kubectl get crds redisversions.catalog.kubedb.com -o=jsonpath='{.items[0].metadata.name}' &> /dev/null; do sleep 1; done; \
-	kubectl wait --for=condition=Established crds -l app=kubedb --timeout=5m; \
+	kubectl wait --for=condition=Established crds -l app.kubernetes.io/name=kubedb --timeout=5m; \
 	helm install kubedb-catalog charts/kubedb-catalog \
 		--namespace=kube-system \
 		--set catalog.elasticsearch=false \
@@ -374,7 +374,7 @@ uninstall:
 
 .PHONY: purge
 purge: uninstall
-	kubectl delete crds -l app=kubedb
+	kubectl delete crds -l app.kubernetes.io/name=kubedb
 
 .PHONY: dev
 dev: gen fmt push
