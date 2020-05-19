@@ -810,8 +810,8 @@ k8s.io/utils v0.0.0-20190801114015-581e00157fb1/go.mod h1:sZAwmy6armz5eXlNoLmJcl
 kmodules.xyz/client-go v0.0.0-20191127054604-26981530831d/go.mod h1:OFxuKCiVR+MYlR2a08FkfaF+IbXkLe0xBetu2LTUuGI=
 kmodules.xyz/client-go v0.0.0-20191211192817-f1dcd02124ba/go.mod h1:OFxuKCiVR+MYlR2a08FkfaF+IbXkLe0xBetu2LTUuGI=
 kmodules.xyz/client-go v0.0.0-20200116162153-e083ae16abca/go.mod h1:OFxuKCiVR+MYlR2a08FkfaF+IbXkLe0xBetu2LTUuGI=
-kmodules.xyz/client-go v0.0.0-20200305091010-36ee6a593ed3 h1:Z+CECj6xED/x7OYd1hnQqFDPx9ou0Ixa5K69vqY7S4c=
-kmodules.xyz/client-go v0.0.0-20200305091010-36ee6a593ed3/go.mod h1:OFxuKCiVR+MYlR2a08FkfaF+IbXkLe0xBetu2LTUuGI=
+kmodules.xyz/client-go v0.0.0-20200518125232-435dcc370844 h1:+g4XBo2szMo3/uPlUrEJjOwyEgv4NRAu0YSlDQOLFDw=
+kmodules.xyz/client-go v0.0.0-20200518125232-435dcc370844/go.mod h1:z/AkrES60XR+jeKGg5zJyPd13NdG/Di0BptbG1gnS60=
 kmodules.xyz/constants v0.0.0-20191024095500-cd4313df4aa6 h1:hFv3DzanQJ/bjgahqosmthGLkVgMB2KuQIsltOA02t0=
 kmodules.xyz/constants v0.0.0-20191024095500-cd4313df4aa6/go.mod h1:DbiFk1bJ1KEO94t1SlAn7tzc+Zz95rSXgyUKa2nzPmY=
 kmodules.xyz/crd-schema-fuzz v0.0.0-20191129174258-81f984340891/go.mod h1:9NXNZ4xhqof0WngtIuo4vl+WoCQpLJEJcyuEo3mPpiM=
@@ -829,8 +829,8 @@ kmodules.xyz/prober v0.0.0-20191216013129-7c91e2b0edb2 h1:wxHidC0FZfaHTRG8ADG9qd
 kmodules.xyz/prober v0.0.0-20191216013129-7c91e2b0edb2/go.mod h1:YdapXw+AMO1U/yYZloDA0dTiha89Rv1iqK05Jh7qQQY=
 kmodules.xyz/webhook-runtime v0.0.0-20191127075323-d4bfdee6974d h1:qLWf0Xk2sAWT9qWBcodkinrzt0jkYTKhuHCsbwpXutE=
 kmodules.xyz/webhook-runtime v0.0.0-20191127075323-d4bfdee6974d/go.mod h1:aaaxyAmKOpw0ey3LrpBkqWq0LTl35f9PW6mhwVDBMow=
-kubedb.dev/apimachinery v0.13.0-rc.4.0.20200427162403-b8047fc0fbf6 h1:icxyiZebtNfu8oIK+cU7jEdMaTQ2Bn23hP08XXMBwLY=
-kubedb.dev/apimachinery v0.13.0-rc.4.0.20200427162403-b8047fc0fbf6/go.mod h1:NGsbuB25b4i7dwR76YFIS/J29BnmLoteoTX7mRnP32g=
+kubedb.dev/apimachinery v0.13.0-rc.4.0.20200519101619-d70848d79c1b h1:EiqHcDV3/7HWVtYrL6ebiHk/MWzNk9qABOzRwBeT+Qw=
+kubedb.dev/apimachinery v0.13.0-rc.4.0.20200519101619-d70848d79c1b/go.mod h1:7ae2YC2hmJnWsIy9b0qNYsRMFZhKDbepp3DeHmwuDAw=
 launchpad.net/gocheck v0.0.0-20140225173054-000000000087/go.mod h1:hj7XX3B/0A+80Vse0e+BUHsHMTEhd0O4cpUHr/e/BUM=
 modernc.org/cc v1.0.0/go.mod h1:1Sk4//wdnYJiUIxnW8ddKpaOJCF37yAdqYnkxUpaYxw=
 modernc.org/golex v1.0.0/go.mod h1:b/QX9oBD/LhixY6NDh+IdGv17hgB+51fET1i2kPSmvk=
