@@ -16,6 +16,7 @@ limitations under the License.
 package framework
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -79,31 +80,31 @@ func (fi *Invocation) RedisCluster() *api.Redis {
 }
 
 func (f *Framework) CreateRedis(obj *api.Redis) error {
-	_, err := f.dbClient.KubedbV1alpha1().Redises(obj.Namespace).Create(obj)
+	_, err := f.dbClient.KubedbV1alpha1().Redises(obj.Namespace).Create(context.TODO(), obj, metav1.CreateOptions{})
 	return err
 }
 
 func (f *Framework) GetRedis(meta metav1.ObjectMeta) (*api.Redis, error) {
-	return f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+	return f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{})
 }
 
 func (f *Framework) PatchRedis(meta metav1.ObjectMeta, transform func(*api.Redis) *api.Redis) (*api.Redis, error) {
-	redis, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+	redis, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-	redis, _, err = util.PatchRedis(f.dbClient.KubedbV1alpha1(), redis, transform)
+	redis, _, err = util.PatchRedis(context.TODO(), f.dbClient.KubedbV1alpha1(), redis, transform, metav1.PatchOptions{})
 	return redis, err
 }
 
 func (f *Framework) DeleteRedis(meta metav1.ObjectMeta) error {
-	return f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Delete(meta.Name, deleteInForeground())
+	return f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Delete(context.TODO(), meta.Name, deleteInForeground())
 }
 
 func (f *Framework) EventuallyRedis(meta metav1.ObjectMeta) GomegaAsyncAssertion {
 	return Eventually(
 		func() bool {
-			_, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+			_, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{})
 			if err != nil {
 				if kerr.IsNotFound(err) {
 					return false
@@ -120,7 +121,7 @@ func (f *Framework) EventuallyRedis(meta metav1.ObjectMeta) GomegaAsyncAssertion
 func (f *Framework) EventuallyRedisPhase(meta metav1.ObjectMeta) GomegaAsyncAssertion {
 	return Eventually(
 		func() api.DatabasePhase {
-			db, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+			db, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
 			return db.Status.Phase
 		},
@@ -132,7 +133,7 @@ func (f *Framework) EventuallyRedisPhase(meta metav1.ObjectMeta) GomegaAsyncAsse
 func (f *Framework) EventuallyRedisRunning(meta metav1.ObjectMeta) GomegaAsyncAssertion {
 	return Eventually(
 		func() bool {
-			redis, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
+			redis, err := f.dbClient.KubedbV1alpha1().Redises(meta.Namespace).Get(context.TODO(), meta.Name, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
 			return redis.Status.Phase == api.DatabasePhaseRunning
 		},
@@ -142,20 +143,20 @@ func (f *Framework) EventuallyRedisRunning(meta metav1.ObjectMeta) GomegaAsyncAs
 }
 
 func (f *Framework) CleanRedis() {
-	redisList, err := f.dbClient.KubedbV1alpha1().Redises(f.namespace).List(metav1.ListOptions{})
+	redisList, err := f.dbClient.KubedbV1alpha1().Redises(f.namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return
 	}
 	for _, e := range redisList.Items {
-		if _, _, err := util.PatchRedis(f.dbClient.KubedbV1alpha1(), &e, func(in *api.Redis) *api.Redis {
+		if _, _, err := util.PatchRedis(context.TODO(), f.dbClient.KubedbV1alpha1(), &e, func(in *api.Redis) *api.Redis {
 			in.ObjectMeta.Finalizers = nil
 			in.Spec.TerminationPolicy = api.TerminationPolicyWipeOut
 			return in
-		}); err != nil {
+		}, metav1.PatchOptions{}); err != nil {
 			fmt.Printf("error Patching Redis. error: %v", err)
 		}
 	}
-	if err := f.dbClient.KubedbV1alpha1().Redises(f.namespace).DeleteCollection(deleteInForeground(), metav1.ListOptions{}); err != nil {
+	if err := f.dbClient.KubedbV1alpha1().Redises(f.namespace).DeleteCollection(context.TODO(), deleteInForeground(), metav1.ListOptions{}); err != nil {
 		fmt.Printf("error in deletion of Redis. Error: %v", err)
 	}
 }
@@ -169,7 +170,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 	}
 
 	// get sts in the namespace
-	stsList, err := f.kubeClient.AppsV1().StatefulSets(meta.Namespace).List(metav1.ListOptions{LabelSelector: labelSelector.String()})
+	stsList, err := f.kubeClient.AppsV1().StatefulSets(meta.Namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: labelSelector.String()})
 	if err != nil {
 		return err
 	}
@@ -181,7 +182,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 	for _, sts := range stsList.Items {
 		// if PDB is not found, send error
 		var pdb *policy.PodDisruptionBudget
-		pdb, err = f.kubeClient.PolicyV1beta1().PodDisruptionBudgets(sts.Namespace).Get(sts.Name, metav1.GetOptions{})
+		pdb, err = f.kubeClient.PolicyV1beta1().PodDisruptionBudgets(sts.Namespace).Get(context.TODO(), sts.Name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -207,7 +208,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 		for i := 0; i < maxUnavailable; i++ {
 			eviction.Name = sts.Name + "-" + strconv.Itoa(i)
 
-			err := f.kubeClient.PolicyV1beta1().Evictions(eviction.Namespace).Evict(eviction)
+			err := f.kubeClient.PolicyV1beta1().Evictions(eviction.Namespace).Evict(context.TODO(), eviction)
 			if err != nil {
 				return err
 			}
@@ -216,7 +217,7 @@ func (f *Framework) EvictPodsFromStatefulSet(meta metav1.ObjectMeta) error {
 		// try to evict one extra pod. TooManyRequests err should occur
 		eviction.Name = sts.Name + "-" + strconv.Itoa(maxUnavailable-1)
 
-		err = f.kubeClient.PolicyV1beta1().Evictions(eviction.Namespace).Evict(eviction)
+		err = f.kubeClient.PolicyV1beta1().Evictions(eviction.Namespace).Evict(context.TODO(), eviction)
 		if kerr.IsTooManyRequests(err) {
 			err = nil
 		} else if err != nil {

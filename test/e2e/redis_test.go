@@ -16,6 +16,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -32,6 +33,7 @@ import (
 	core "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	exec_util "kmodules.xyz/client-go/tools/exec"
 )
 
@@ -522,7 +524,7 @@ var _ = Describe("Redis", func() {
 					createAndWaitForRunning()
 
 					By("Updating Envs")
-					_, _, err := util.PatchRedis(f.ExtClient().KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
+					_, _, err := util.PatchRedis(context.TODO(), f.ExtClient().KubedbV1alpha1(), redis, func(in *api.Redis) *api.Redis {
 						in.Spec.PodTemplate.Spec.Env = []core.EnvVar{
 							{
 								Name:  "TEST_ENV",
@@ -530,7 +532,7 @@ var _ = Describe("Redis", func() {
 							},
 						}
 						return in
-					})
+					}, metav1.PatchOptions{})
 
 					Expect(err).NotTo(HaveOccurred())
 				})
