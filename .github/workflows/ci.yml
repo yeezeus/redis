@@ -69,7 +69,7 @@ jobs:
     - name: Create Kubernetes ${{ matrix.cluster }} cluster
       id: kind
       run: |
-        kind create cluster --image=kindest/node:${{ matrix.cluster }}
+        kind create cluster --image=kindest/node:${{ matrix.cluster }} --config=hack/kubernetes/kind.yaml
 
     # - name: Create Kubernetes ${{ matrix.cluster }} cluster
     #   id: kind
