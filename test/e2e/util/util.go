@@ -16,6 +16,7 @@ limitations under the License.
 package util
 
 import (
+	"context"
 	"fmt"
 
 	api "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
@@ -33,6 +34,7 @@ import (
 
 func WaitUntilFailedNodeAvailable(kubeClient kubernetes.Interface, statefulSet *apps.StatefulSet) error {
 	return core_util.WaitUntilPodRunningBySelector(
+		context.TODO(),
 		kubeClient,
 		statefulSet.Namespace,
 		statefulSet.Spec.Selector,
@@ -61,7 +63,7 @@ func ForwardPort(
 func GetPods(
 	kubeClient kubernetes.Interface,
 	meta metav1.ObjectMeta, selector labels.Set) (*core.PodList, error) {
-	return kubeClient.CoreV1().Pods(meta.Namespace).List(metav1.ListOptions{
+	return kubeClient.CoreV1().Pods(meta.Namespace).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector.String(),
 	})
 }

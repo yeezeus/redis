@@ -16,6 +16,7 @@ limitations under the License.
 package framework
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -28,7 +29,7 @@ import (
 )
 
 func (f *Framework) GetDatabasePod(meta metav1.ObjectMeta) (*core.Pod, error) {
-	return f.kubeClient.CoreV1().Pods(meta.Namespace).Get(meta.Name+"-0", metav1.GetOptions{})
+	return f.kubeClient.CoreV1().Pods(meta.Namespace).Get(context.TODO(), meta.Name+"-0", metav1.GetOptions{})
 }
 
 func (f *Framework) GetRedisClient(meta metav1.ObjectMeta) (*redis.Client, error) {

@@ -16,6 +16,7 @@ limitations under the License.
 package framework
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
@@ -259,6 +260,7 @@ func (f *Framework) WaitUntilStatefulSetReady(redis *api.Redis) error {
 		for j := 0; j <= int(*redis.Spec.Cluster.Replicas); j++ {
 			podName := fmt.Sprintf("%s-shard%d-%d", redis.Name, i, j)
 			err := core_util.WaitUntilPodRunning(
+				context.TODO(),
 				f.kubeClient,
 				metav1.ObjectMeta{
 					Name:      podName,
